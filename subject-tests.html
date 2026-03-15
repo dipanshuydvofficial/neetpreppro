@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subject Tests — NEETPrep Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --accent: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 280px;
+            max-width: 360px;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: .9rem;
+            font-weight: 500;
+            animation: toastIn .35s cubic-bezier(.34, 1.56, .64, 1) forwards;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--accent);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(0)
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+        }
+
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, .8);
+            backdrop-filter: blur(4px);
+            z-index: 8888;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 5%;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .nav-logo .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .nav-logo span {
+            color: var(--primary);
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-link {
+            padding: 8px 14px;
+            border-radius: 9px;
+            font-size: .9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: background .2s, color .2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(37, 99, 235, .08);
+            color: var(--primary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background .2s;
+        }
+
+        .avatar-btn:hover {
+            background: var(--bg);
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .9rem;
+        }
+
+        .avatar-name {
+            font-size: .88rem;
+            font-weight: 600;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dropdown-wrap {
+            position: relative;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            min-width: 190px;
+            padding: 8px;
+            z-index: 200;
+            display: none;
+        }
+
+        .dropdown.open {
+            display: block;
+            animation: fadeDown .2s ease;
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: .88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg);
+        }
+
+        .dropdown-item.danger {
+            color: var(--danger);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 6px 0;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            background: none;
+            border: none;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 2px;
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            inset: 68px 0 0;
+            background: var(--surface);
+            z-index: 99;
+            padding: 20px 5%;
+            flex-direction: column;
+            gap: 4px;
+            border-top: 1px solid var(--border);
+        }
+
+        .mobile-nav.open {
+            display: flex;
+        }
+
+        .mobile-nav .nav-link {
+            padding: 12px 16px;
+            font-size: 1rem;
+        }
+
+        /* Page */
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 36px 5% 60px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .83rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .breadcrumb span {
+            color: var(--border);
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+        }
+
+        .page-header p {
+            font-size: .95rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            max-width: 540px;
+            line-height: 1.7;
+        }
+
+        /* Hero Subject Cards — 3 large panels */
+        .subjects-hero {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .subj-hero-card {
+            border-radius: 22px;
+            overflow: hidden;
+            position: relative;
+            cursor: default;
+        }
+
+        .subj-hero-card.physics {
+            background: linear-gradient(135deg, #1e3a5f, #2563eb);
+        }
+
+        .subj-hero-card.chemistry {
+            background: linear-gradient(135deg, #4a1942, #9333ea);
+        }
+
+        .subj-hero-card.biology {
+            background: linear-gradient(135deg, #14532d, #16a34a);
+        }
+
+        .subj-hero-card::after {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .05);
+        }
+
+        .subj-hero-inner {
+            padding: 32px 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subj-emoji {
+            font-size: 2.6rem;
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .subj-hero-card h2 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .subj-hero-card p {
+            font-size: .88rem;
+            color: rgba(255, 255, 255, .7);
+            line-height: 1.65;
+            margin-bottom: 20px;
+        }
+
+        .subj-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .subj-stat {
+            text-align: left;
+        }
+
+        .subj-stat strong {
+            display: block;
+            font-family: 'Sora', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .subj-stat span {
+            font-size: .75rem;
+            color: rgba(255, 255, 255, .55);
+        }
+
+        .btn-start-white {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 22px;
+            background: rgba(255, 255, 255, .15);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            border: 1.5px solid rgba(255, 255, 255, .3);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+            text-decoration: none;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-start-white:hover {
+            background: rgba(255, 255, 255, .25);
+            transform: translateY(-1px);
+        }
+
+        .tests-count-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .8rem;
+            color: rgba(255, 255, 255, .5);
+            margin-bottom: 12px;
+        }
+
+        .test-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .4);
+        }
+
+        /* Tests list below hero cards */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tests-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .test-row {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: transform .2s, box-shadow .2s, border-color .2s;
+        }
+
+        .test-row:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: rgba(37, 99, 235, .2);
+        }
+
+        .test-row-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .test-row-info {
+            flex: 1;
+        }
+
+        .test-row-title {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .test-row-meta {
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+
+        .row-meta-chip {
+            font-size: .78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .subject-pill {
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 100px;
+        }
+
+        .pill-physics {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .pill-chemistry {
+            background: #fdf4ff;
+            color: #9333ea;
+        }
+
+        .pill-biology {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .btn-start-sm {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 9px 18px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .84rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-start-sm:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            padding: 56px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .empty-state h4 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            font-size: .88rem;
+            color: var(--text-muted);
+        }
+
+        @media(max-width:900px) {
+            .subjects-hero {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-center {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+        }
+
+        @media(max-width:640px) {
+            .test-row {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toast-container"></div>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon">⚡</div>NEET<span>Prep</span> Pro
+        </a>
+        <div class="nav-center">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="topic-tests.html" class="nav-link">Topic Tests</a>
+            <a href="chapter-tests.html" class="nav-link">Chapter Tests</a>
+            <a href="subject-tests.html" class="nav-link active">Subject Tests</a>
+            <a href="mock-tests.html" class="nav-link">Mock Tests</a>
+            <a href="history.html" class="nav-link">History</a>
+        </div>
+        <div class="nav-right">
+            <div class="dropdown-wrap">
+                <button class="avatar-btn" id="avatar-btn">
+                    <div class="avatar" id="user-avatar">?</div>
+                    <span class="avatar-name" id="user-name-nav">…</span>
+                    <span style="color:var(--text-muted);font-size:.8rem;">▾</span>
+                </button>
+                <div class="dropdown" id="nav-dropdown">
+                    <a href="dashboard.html" class="dropdown-item">📊 Dashboard</a>
+                    <a href="history.html" class="dropdown-item">📋 History</a>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item danger" id="btn-logout">🚪 Log Out</div>
+                </div>
+            </div>
+        </div>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </nav>
+    <div class="mobile-nav" id="mobile-nav">
+        <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+        <a href="topic-tests.html" class="nav-link">🎯 Topic Tests</a>
+        <a href="chapter-tests.html" class="nav-link">📖 Chapter Tests</a>
+        <a href="subject-tests.html" class="nav-link active">🏫 Subject Tests</a>
+        <a href="mock-tests.html" class="nav-link">📝 Mock Tests</a>
+        <a href="history.html" class="nav-link">📋 History</a>
+        <div style="height:1px;background:var(--border);margin:8px 0;"></div>
+        <div class="nav-link" id="mobile-logout" style="color:var(--danger);cursor:pointer;">🚪 Log Out</div>
+    </div>
+
+    <div class="page">
+        <div class="page-header">
+            <div class="breadcrumb">
+                <a href="dashboard.html">Dashboard</a><span>/</span><span>Subject Tests</span>
+            </div>
+            <h1>🏫 Subject Tests</h1>
+            <p>Full-syllabus tests for each NEET subject. Challenge yourself across all chapters in one sitting and identify your strongest and weakest areas.</p>
+        </div>
+
+        <!-- Subject Hero Cards -->
+        <div class="subjects-hero">
+            <div class="subj-hero-card physics">
+                <div class="subj-hero-inner">
+                    <span class="subj-emoji">⚡</span>
+                    <h2>Physics</h2>
+                    <p>Covers all 29 chapters from Mechanics to Modern Physics. Master numerical problems and conceptual theory.</p>
+                    <div class="subj-stats">
+                        <div class="subj-stat"><strong id="phys-tests">—</strong><span>Tests Available</span></div>
+                        <div class="subj-stat"><strong>45</strong><span>Questions avg</span></div>
+                        <div class="subj-stat"><strong>60 min</strong><span>avg Duration</span></div>
+                    </div>
+                    <div class="tests-count-row"><span class="test-dot"></span>Full NEET Physics Syllabus</div>
+                </div>
+            </div>
+            <div class="subj-hero-card chemistry">
+                <div class="subj-hero-inner">
+                    <span class="subj-emoji">🧪</span>
+                    <h2>Chemistry</h2>
+                    <p>Physical, Inorganic & Organic Chemistry. Build speed and accuracy across reactions, structures, and calculations.</p>
+                    <div class="subj-stats">
+                        <div class="subj-stat"><strong id="chem-tests">—</strong><span>Tests Available</span></div>
+                        <div class="subj-stat"><strong>45</strong><span>Questions avg</span></div>
+                        <div class="subj-stat"><strong>60 min</strong><span>avg Duration</span></div>
+                    </div>
+                    <div class="tests-count-row"><span class="test-dot"></span>Full NEET Chemistry Syllabus</div>
+                </div>
+            </div>
+            <div class="subj-hero-card biology">
+                <div class="subj-hero-inner">
+                    <span class="subj-emoji">🧬</span>
+                    <h2>Biology</h2>
+                    <p>Botany + Zoology combined. The highest-scoring subject in NEET — 90 questions across all life science topics.</p>
+                    <div class="subj-stats">
+                        <div class="subj-stat"><strong id="bio-tests">—</strong><span>Tests Available</span></div>
+                        <div class="subj-stat"><strong>90</strong><span>Questions avg</span></div>
+                        <div class="subj-stat"><strong>90 min</strong><span>avg Duration</span></div>
+                    </div>
+                    <div class="tests-count-row"><span class="test-dot"></span>Full NEET Biology Syllabus</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Subject Tests List -->
+        <div class="section-title">📋 All Subject Tests</div>
+        <div id="tests-container">
+            <!-- Skeleton -->
+            ${[1,2,3].map(()=>`
+            <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:18px 22px;display:flex;gap:16px;margin-bottom:12px;">
+                <div class="skeleton" style="width:42px;height:42px;border-radius:11px;flex-shrink:0;"></div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+                    <div class="skeleton" style="width:50%;height:18px;"></div>
+                    <div class="skeleton" style="width:70%;height:14px;"></div>
+                </div>
+                <div class="skeleton" style="width:90px;height:36px;border-radius:9px;align-self:center;"></div>
+            </div>
+            `).join('')}
+        </div>
+    </div>
+
+    <script type="module">
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import {
+            getDatabase,
+            ref,
+            get,
+            query,
+            orderByChild,
+            equalTo
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyA1GdFV2LYAUktkNswT4axg1fr6UrYEF48",
+  authDomain: "neetpreppro-445b2.firebaseapp.com",
+  databaseURL: "https://neetpreppro-445b2-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "neetpreppro-445b2",
+  storageBucket: "neetpreppro-445b2.firebasestorage.app",
+  messagingSenderId: "589750441567",
+  appId: "1:589750441567:web:7396b9de030374cabe2dea",
+  measurementId: "G-7SYLBDLY71"
+};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        function showToast(msg, type = 'info') {
+            const c = document.getElementById('toast-container');
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${msg}</span><button class="toast-close">✕</button>`;
+            t.querySelector('.toast-close').addEventListener('click', () => dismiss(t));
+            c.appendChild(t);
+            setTimeout(() => dismiss(t), 4000);
+        }
+
+        function dismiss(t) {
+            t.style.animation = 'toastOut .3s ease forwards';
+            setTimeout(() => t.remove(), 300);
+        }
+
+        onAuthStateChanged(auth, async user => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const n = user.displayName || 'Student';
+            document.getElementById('user-name-nav').textContent = n.split(' ')[0];
+            document.getElementById('user-avatar').textContent = n[0].toUpperCase();
+            await loadTests();
+        });
+
+        async function loadTests() {
+            try {
+                const snap = await get(query(ref(db, 'tests'), orderByChild('type'), equalTo('subject')));
+                const tests = [];
+                if (snap.exists()) snap.forEach(c => tests.push({
+                    id: c.key,
+                    ...c.val()
+                }));
+
+                // Update hero count badges
+                document.getElementById('phys-tests').textContent = tests.filter(t => t.subject === 'Physics').length || '0';
+                document.getElementById('chem-tests').textContent = tests.filter(t => t.subject === 'Chemistry').length || '0';
+                document.getElementById('bio-tests').textContent = tests.filter(t => t.subject === 'Biology').length || '0';
+
+                // Add "start" button to hero cards now we have IDs
+                ['Physics', 'Chemistry', 'Biology'].forEach(s => {
+                    const found = tests.find(t => t.subject === s);
+                    const heroCard = document.querySelector(`.subj-hero-card.${s.toLowerCase()}`);
+                    if (heroCard && found) {
+                        const btn = document.createElement('a');
+                        btn.href = `exam.html?testId=${found.id}`;
+                        btn.className = 'btn-start-white';
+                        btn.textContent = `Start ${s} Test →`;
+                        heroCard.querySelector('.subj-hero-inner').appendChild(btn);
+                    }
+                });
+
+                renderList(tests);
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to load subject tests.', 'error');
+                document.getElementById('tests-container').innerHTML = '<div class="empty-state"><h4>Failed to load</h4><p>Please refresh the page.</p></div>';
+            }
+        }
+
+        function renderList(tests) {
+            const container = document.getElementById('tests-container');
+            if (!tests.length) {
+                container.innerHTML = '<div class="empty-state"><h4>No Subject Tests Yet</h4><p>Check back later or ask your admin to add subject tests.</p></div>';
+                return;
+            }
+
+            const icons = {
+                Physics: '⚡',
+                Chemistry: '🧪',
+                Biology: '🧬'
+            };
+            const iconBg = {
+                Physics: '#eff6ff',
+                Chemistry: '#fdf4ff',
+                Biology: '#f0fdf4'
+            };
+            const pillCls = {
+                Physics: 'pill-physics',
+                Chemistry: 'pill-chemistry',
+                Biology: 'pill-biology'
+            };
+
+            container.innerHTML = `<div class="tests-list">${tests.map(t=>`
+        <div class="test-row">
+          <div class="test-row-icon" style="background:${iconBg[t.subject]||'#f1f5f9'};">${icons[t.subject]||'📚'}</div>
+          <div class="test-row-info">
+            <div class="test-row-title">${t.title||t.subject+' Full Test'}</div>
+            <div class="test-row-meta">
+              <span class="subject-pill ${pillCls[t.subject]||''}">${t.subject}</span>
+              <span class="row-meta-chip">❓ ${(t.questionIds||[]).length} Questions</span>
+              <span class="row-meta-chip">⏱ ${t.duration||60} min</span>
+              <span class="row-meta-chip">✏️ ${(t.questionIds||[]).length*4} marks</span>
+            </div>
+          </div>
+          <a href="exam.html?testId=${t.id}" class="btn-start-sm">Start →</a>
+        </div>
+      `).join('')}</div>`;
+        }
+
+        // Avatar dropdown
+        const avatarBtn = document.getElementById('avatar-btn');
+        const dropdown = document.getElementById('nav-dropdown');
+        avatarBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            dropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', () => dropdown.classList.remove('open'));
+
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (e) {
+                console.error(e);
+                showToast('Logout failed.', 'error');
+            }
+        }
+        document.getElementById('btn-logout').addEventListener('click', handleLogout);
+        document.getElementById('mobile-logout').addEventListener('click', handleLogout);
+
+        const hb = document.getElementById('hamburger');
+        const mn = document.getElementById('mobile-nav');
+        hb.addEventListener('click', () => mn.classList.toggle('open'));
+        document.addEventListener('click', e => {
+            if (!hb.contains(e.target) && !mn.contains(e.target)) mn.classList.remove('open');
+        });
+    </script>
+</body>
+
+</html>

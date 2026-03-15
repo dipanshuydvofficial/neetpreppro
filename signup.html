@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account — NEETPrep Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        /* ── Design Tokens ─────────────────────────────────────────────── */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --accent: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+        }
+
+        /* ── Reset & Base ───────────────────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        a:hover {
+            opacity: 0.8;
+        }
+
+        /* ── Toast ──────────────────────────────────────────────────────── */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 280px;
+            max-width: 360px;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--accent);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(60px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(60px);
+            }
+        }
+
+        /* ── Loading Overlay ────────────────────────────────────────────── */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 8888;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── Navbar ─────────────────────────────────────────────────────── */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 5%;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-logo .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .nav-logo span {
+            color: var(--primary);
+        }
+
+        /* ── Main Grid ──────────────────────────────────────────────────── */
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: calc(100vh - 64px);
+        }
+
+        /* Left — Decorative */
+        .auth-deco {
+            background: linear-gradient(145deg, #0f172a 0%, #1e3a5f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+            order: 1;
+        }
+
+        .auth-deco::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.15);
+        }
+
+        .auth-deco::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            left: -60px;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .deco-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .deco-content h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .perks {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .perk {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 16px 18px;
+        }
+
+        .perk-icon {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .perk h4 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .perk p {
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.55;
+        }
+
+        .deco-note {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Right — Form */
+        .auth-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 5%;
+            background: var(--surface);
+            order: 2;
+            overflow-y: auto;
+        }
+
+        .auth-box {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .auth-heading {
+            margin-bottom: 28px;
+        }
+
+        .auth-heading h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .auth-heading p {
+            font-size: 0.93rem;
+            color: var(--text-muted);
+            margin-top: 7px;
+        }
+
+        /* Form Divider */
+        .form-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .form-divider::before,
+        .form-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .form-divider span {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* Form Group */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 7px;
+        }
+
+        .form-group label .required {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            pointer-events: none;
+            color: var(--text-muted);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            background: var(--bg);
+            color: var(--text-primary);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            background: var(--surface);
+        }
+
+        .form-group input.error-field {
+            border-color: var(--danger);
+        }
+
+        .form-group input.error-field:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+        }
+
+        .field-error {
+            font-size: 0.8rem;
+            color: var(--danger);
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .field-success {
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Password Toggle */
+        .pwd-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* ── Password Strength Meter ────────────────────────────────────── */
+        .strength-meter {
+            margin-top: 10px;
+        }
+
+        .strength-bars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 6px;
+        }
+
+        .strength-bar {
+            flex: 1;
+            height: 4px;
+            border-radius: 100px;
+            background: var(--border);
+            transition: background 0.3s;
+        }
+
+        .strength-bar.weak {
+            background: var(--danger);
+        }
+
+        .strength-bar.fair {
+            background: var(--warning);
+        }
+
+        .strength-bar.good {
+            background: #3b82f6;
+        }
+
+        .strength-bar.strong {
+            background: var(--accent);
+        }
+
+        .strength-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .strength-label.weak {
+            color: var(--danger);
+        }
+
+        .strength-label.fair {
+            color: var(--warning);
+        }
+
+        .strength-label.good {
+            color: #3b82f6;
+        }
+
+        .strength-label.strong {
+            color: var(--accent);
+        }
+
+        /* Password Requirements List */
+        .pwd-requirements {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 12px;
+        }
+
+        .req-item {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .req-item::before {
+            content: '○';
+            color: var(--border);
+            font-size: 0.7rem;
+        }
+
+        .req-item.met {
+            color: var(--accent);
+        }
+
+        .req-item.met::before {
+            content: '✓';
+            color: var(--accent);
+        }
+
+        /* Terms */
+        .terms-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 0.87rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            line-height: 1.5;
+        }
+
+        .terms-check input[type="checkbox"] {
+            accent-color: var(--primary);
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            padding: 13px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, transform 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-google:hover {
+            background: var(--bg);
+            border-color: #bfdbfe;
+            transform: translateY(-1px);
+        }
+
+        .btn-google:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Name row */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        /* ── Responsive ─────────────────────────────────────────────────── */
+        @media (max-width: 900px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-deco {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .auth-panel {
+                padding: 32px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── Toast Container ──────────────────────────────────────────── -->
+    <div id="toast-container"></div>
+
+    <!-- ── Loading Overlay ──────────────────────────────────────────── -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- ── Navbar ───────────────────────────────────────────────────── -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon">⚡</div>
+            NEET<span>Prep</span> Pro
+        </a>
+        <span style="font-size:0.9rem;color:var(--text-muted);">
+            Already have an account? <a href="login.html">Log in</a>
+        </span>
+    </nav>
+
+    <!-- ── Main ─────────────────────────────────────────────────────── -->
+    <main>
+        <!-- Left Decorative Panel -->
+        <div class="auth-deco">
+            <div class="deco-content">
+                <h2>Join 50,000+ students<br />cracking NEET 🚀</h2>
+                <div class="perks">
+                    <div class="perk">
+                        <div class="perk-icon">🎯</div>
+                        <div>
+                            <h4>Topic-level precision</h4>
+                            <p>Practice exactly where you're weak. Our tests are mapped to every subtopic in the NEET syllabus.</p>
+                        </div>
+                    </div>
+                    <div class="perk">
+                        <div class="perk-icon">📊</div>
+                        <div>
+                            <h4>Real-time analytics</h4>
+                            <p>Track your progress across subjects, see accuracy trends, and know your strong & weak areas.</p>
+                        </div>
+                    </div>
+                    <div class="perk">
+                        <div class="perk-icon">🔖</div>
+                        <div>
+                            <h4>Bookmark & review</h4>
+                            <p>Save questions during exams. Build a personal revision bank of concepts that trip you up.</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="deco-note">🔒 Your data is secure. No spam. Unsubscribe anytime.</p>
+            </div>
+        </div>
+
+        <!-- Right Form Panel -->
+        <div class="auth-panel">
+            <div class="auth-box">
+                <div class="auth-heading">
+                    <h1>Create your account</h1>
+                    <p>Start practicing NEET topics for free — no credit card needed.</p>
+                </div>
+
+                <!-- Google Sign Up -->
+                <button class="btn-google" id="btn-google" type="button">
+                    <svg class="google-icon" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                        <path fill="none" d="M0 0h48v48H0z" />
+                    </svg>
+                    Sign up with Google
+                </button>
+
+                <div class="form-divider"><span>or create account with email</span></div>
+
+                <!-- Registration Form -->
+                <form id="signup-form" novalidate>
+
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label for="name">Full Name <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="name" name="name" placeholder="Aryan Sharma" autocomplete="name" />
+                        </div>
+                        <div class="field-error" id="name-error" style="display:none;"></div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">Email address <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <span class="input-icon">📧</span>
+                            <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" />
+                        </div>
+                        <div class="field-error" id="email-error" style="display:none;"></div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label for="password">Password <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="password" name="password" placeholder="Create a strong password" autocomplete="new-password" />
+                            <button type="button" class="pwd-toggle" id="pwd-toggle1" aria-label="Toggle password">👁️</button>
+                        </div>
+                        <div class="field-error" id="password-error" style="display:none;"></div>
+
+                        <!-- Strength Meter -->
+                        <div class="strength-meter" id="strength-meter" style="display:none;">
+                            <div class="strength-bars">
+                                <div class="strength-bar" id="bar1"></div>
+                                <div class="strength-bar" id="bar2"></div>
+                                <div class="strength-bar" id="bar3"></div>
+                                <div class="strength-bar" id="bar4"></div>
+                            </div>
+                            <span class="strength-label" id="strength-label">Weak</span>
+                        </div>
+
+                        <!-- Requirements checklist -->
+                        <div class="pwd-requirements" id="pwd-requirements" style="display:none;">
+                            <span class="req-item" id="req-len">At least 8 characters</span>
+                            <span class="req-item" id="req-upper">Uppercase letter</span>
+                            <span class="req-item" id="req-num">A number</span>
+                            <span class="req-item" id="req-special">Special character</span>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm Password <span class="required">*</span></label>
+                        <div class="input-wrap">
+                            <span class="input-icon">🔏</span>
+                            <input type="password" id="confirm-password" name="confirm-password" placeholder="Re-enter your password" autocomplete="new-password" />
+                            <button type="button" class="pwd-toggle" id="pwd-toggle2" aria-label="Toggle confirm password">👁️</button>
+                        </div>
+                        <div class="field-error" id="confirm-error" style="display:none;"></div>
+                        <div class="field-success" id="confirm-match" style="display:none;">✓ Passwords match</div>
+                    </div>
+
+                    <!-- Terms & Conditions -->
+                    <label class="terms-check">
+                        <input type="checkbox" id="terms" />
+                        <span>I agree to the <a href="#" style="color:var(--primary);">Terms of Service</a> and <a href="#" style="color:var(--primary);">Privacy Policy</a>.</span>
+                    </label>
+                    <div class="field-error" id="terms-error" style="display:none;"></div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn-primary" id="btn-signup">
+                        <span id="btn-signup-text">Create Account</span>
+                    </button>
+
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account? <a href="login.html">Log in here</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ── Firebase & Auth Logic ─────────────────────────────────────── -->
+    <script type="module">
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithPopup,
+            GoogleAuthProvider,
+            updateProfile,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import {
+            getDatabase,
+            ref,
+            set,
+            get
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        // ── Firebase Config ─────────────────────────────────────────────
+        const firebaseConfig = {
+  apiKey: "AIzaSyA1GdFV2LYAUktkNswT4axg1fr6UrYEF48",
+  authDomain: "neetpreppro-445b2.firebaseapp.com",
+  databaseURL: "https://neetpreppro-445b2-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "neetpreppro-445b2",
+  storageBucket: "neetpreppro-445b2.firebasestorage.app",
+  messagingSenderId: "589750441567",
+  appId: "1:589750441567:web:7396b9de030374cabe2dea",
+  measurementId: "G-7SYLBDLY71"
+};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // ── Auth Error Map ──────────────────────────────────────────────
+        const authErrors = {
+            "auth/email-already-in-use": "An account with this email already exists.",
+            "auth/invalid-email": "Please enter a valid email address.",
+            "auth/weak-password": "Password must be at least 6 characters.",
+            "auth/popup-closed-by-user": "Google sign-up was cancelled.",
+            "auth/network-request-failed": "Network error. Check your connection.",
+            "auth/too-many-requests": "Too many requests. Please wait a moment."
+        };
+
+        // ── Toast ────────────────────────────────────────────────────────
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+        <span class="toast-icon">${icons[type] || icons.info}</span>
+        <span>${message}</span>
+        <button class="toast-close" aria-label="Dismiss">✕</button>
+      `;
+            toast.querySelector('.toast-close').addEventListener('click', () => dismissToast(toast));
+            container.appendChild(toast);
+            setTimeout(() => dismissToast(toast), 4000);
+        }
+
+        function dismissToast(toast) {
+            toast.style.animation = 'toastOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }
+
+        // ── Loading Overlay ─────────────────────────────────────────────
+        function setLoading(active) {
+            const overlay = document.getElementById('loading-overlay');
+            if (active) overlay.classList.add('active');
+            else overlay.classList.remove('active');
+        }
+
+        // ── Field Error Helpers ─────────────────────────────────────────
+        function showFieldError(fieldId, errorId, message) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(errorId);
+            if (field) field.classList.add('error-field');
+            if (error) {
+                error.innerHTML = `⚠ ${message}`;
+                error.style.display = 'flex';
+            }
+        }
+
+        function clearFieldError(fieldId, errorId) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(errorId);
+            if (field) field.classList.remove('error-field');
+            if (error) error.style.display = 'none';
+        }
+
+        function clearAllErrors() {
+            ['name', 'email', 'password', 'confirm-password'].forEach(id => {
+                clearFieldError(id, id + '-error');
+            });
+            clearFieldError('confirm-password', 'confirm-error');
+            clearFieldError(null, 'terms-error');
+        }
+
+        // ── Password Strength Evaluator ─────────────────────────────────
+        /**
+         * Returns a score 0–4 and a label for password strength.
+         * Checks: length ≥ 8, uppercase, number, special character
+         */
+        function evaluateStrength(pwd) {
+            let score = 0;
+            const checks = {
+                len: pwd.length >= 8,
+                upper: /[A-Z]/.test(pwd),
+                num: /[0-9]/.test(pwd),
+                special: /[^A-Za-z0-9]/.test(pwd)
+            };
+            Object.values(checks).forEach(c => {
+                if (c) score++;
+            });
+            const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+            const classes = ['', 'weak', 'fair', 'good', 'strong'];
+            return {
+                score,
+                label: labels[score] || 'Weak',
+                cls: classes[score] || 'weak',
+                checks
+            };
+        }
+
+        function updateStrengthMeter(pwd) {
+            const meter = document.getElementById('strength-meter');
+            const reqs = document.getElementById('pwd-requirements');
+            const label = document.getElementById('strength-label');
+            const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3'), document.getElementById('bar4')];
+
+            if (!pwd) {
+                meter.style.display = 'none';
+                reqs.style.display = 'none';
+                return;
+            }
+
+            meter.style.display = 'block';
+            reqs.style.display = 'grid';
+
+            const {
+                score,
+                label: lbl,
+                cls,
+                checks
+            } = evaluateStrength(pwd);
+
+            // Update bars
+            bars.forEach((bar, i) => {
+                bar.className = 'strength-bar';
+                if (i < score) bar.classList.add(cls);
+            });
+
+            // Update label
+            label.className = `strength-label ${cls}`;
+            label.textContent = lbl;
+
+            // Update requirement dots
+            const reqLen = document.getElementById('req-len');
+            const reqUpper = document.getElementById('req-upper');
+            const reqNum = document.getElementById('req-num');
+            const reqSpecial = document.getElementById('req-special');
+
+            reqLen.className = `req-item${checks.len     ? ' met' : ''}`;
+            reqUpper.className = `req-item${checks.upper   ? ' met' : ''}`;
+            reqNum.className = `req-item${checks.num     ? ' met' : ''}`;
+            reqSpecial.className = `req-item${checks.special ? ' met' : ''}`;
+        }
+
+        // ── Confirm Password Match ──────────────────────────────────────
+        function checkPasswordMatch() {
+            const pwd = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm-password').value;
+            const matchEl = document.getElementById('confirm-match');
+            const errEl = document.getElementById('confirm-error');
+
+            if (!confirm) {
+                matchEl.style.display = 'none';
+                errEl.style.display = 'none';
+                return;
+            }
+            if (pwd === confirm) {
+                matchEl.style.display = 'flex';
+                errEl.style.display = 'none';
+                document.getElementById('confirm-password').classList.remove('error-field');
+            } else {
+                matchEl.style.display = 'none';
+            }
+        }
+
+        // ── Full Form Validation ────────────────────────────────────────
+        function validateForm() {
+            clearAllErrors();
+            let valid = true;
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm-password').value;
+            const terms = document.getElementById('terms').checked;
+
+            // Name
+            if (!name) {
+                showFieldError('name', 'name-error', 'Full name is required.');
+                valid = false;
+            } else if (name.length < 2) {
+                showFieldError('name', 'name-error', 'Please enter your full name.');
+                valid = false;
+            }
+
+            // Email
+            if (!email) {
+                showFieldError('email', 'email-error', 'Email address is required.');
+                valid = false;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showFieldError('email', 'email-error', 'Please enter a valid email.');
+                valid = false;
+            }
+
+            // Password
+            if (!password) {
+                showFieldError('password', 'password-error', 'Password is required.');
+                valid = false;
+            } else if (password.length < 6) {
+                showFieldError('password', 'password-error', 'Password must be at least 6 characters.');
+                valid = false;
+            }
+
+            // Confirm password
+            if (!confirm) {
+                showFieldError('confirm-password', 'confirm-error', 'Please confirm your password.');
+                valid = false;
+            } else if (password !== confirm) {
+                showFieldError('confirm-password', 'confirm-error', 'Passwords do not match.');
+                valid = false;
+            }
+
+            // Terms
+            if (!terms) {
+                const termsErr = document.getElementById('terms-error');
+                termsErr.innerHTML = '⚠ You must agree to the Terms of Service to continue.';
+                termsErr.style.display = 'flex';
+                valid = false;
+            }
+
+            return valid;
+        }
+
+        // ── Write new user to Realtime DB ───────────────────────────────
+        async function createUserRecord(uid, name, email) {
+            await set(ref(db, `users/${uid}`), {
+                name: name,
+                email: email,
+                role: 'student',
+                createdAt: Date.now()
+            });
+        }
+
+        // ── Redirect if already logged in ──────────────────────────────
+        onAuthStateChanged(auth, (user) => {
+            if (user) window.location.href = 'dashboard.html';
+        });
+
+        // ── Email Sign Up ────────────────────────────────────────────────
+        const signupForm = document.getElementById('signup-form');
+        const btnSignup = document.getElementById('btn-signup');
+        const btnText = document.getElementById('btn-signup-text');
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!validateForm()) return;
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                setLoading(true);
+                btnSignup.disabled = true;
+                btnText.textContent = 'Creating account…';
+
+                // Create auth user
+                const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+                // Set display name in Firebase Auth
+                await updateProfile(cred.user, {
+                    displayName: name
+                });
+
+                // Write student record to DB
+                await createUserRecord(cred.user.uid, name, email);
+
+                showToast('Account created! Taking you to your dashboard…', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+
+            } catch (err) {
+                console.error(err);
+                const message = authErrors[err.code] || 'Registration failed. Please try again.';
+                showToast(message, 'error');
+                btnSignup.disabled = false;
+                btnText.textContent = 'Create Account';
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // ── Google Sign Up ───────────────────────────────────────────────
+        document.getElementById('btn-google').addEventListener('click', async () => {
+            try {
+                setLoading(true);
+                document.getElementById('btn-google').disabled = true;
+
+                const provider = new GoogleAuthProvider();
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+
+                // Check if user already exists in DB; create if not
+                const snap = await get(ref(db, `users/${user.uid}`));
+                if (!snap.exists()) {
+                    await createUserRecord(user.uid, user.displayName || 'Student', user.email);
+                }
+
+                showToast('Signed up with Google! Redirecting…', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 800);
+
+            } catch (err) {
+                console.error(err);
+                const message = authErrors[err.code] || 'Google sign-up failed. Please try again.';
+                showToast(message, 'error');
+                document.getElementById('btn-google').disabled = false;
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // ── Password strength on input ──────────────────────────────────
+        document.getElementById('password').addEventListener('input', (e) => {
+            clearFieldError('password', 'password-error');
+            updateStrengthMeter(e.target.value);
+            checkPasswordMatch();
+        });
+
+        // ── Confirm password live check ─────────────────────────────────
+        document.getElementById('confirm-password').addEventListener('input', () => {
+            clearFieldError('confirm-password', 'confirm-error');
+            checkPasswordMatch();
+        });
+
+        // ── Clear other errors on input ─────────────────────────────────
+        document.getElementById('name').addEventListener('input', () => clearFieldError('name', 'name-error'));
+        document.getElementById('email').addEventListener('input', () => clearFieldError('email', 'email-error'));
+
+        // ── Terms error clear ───────────────────────────────────────────
+        document.getElementById('terms').addEventListener('change', () => {
+            document.getElementById('terms-error').style.display = 'none';
+        });
+
+        // ── Password visibility toggles ─────────────────────────────────
+        function setupPwdToggle(toggleId, inputId) {
+            document.getElementById(toggleId).addEventListener('click', () => {
+                const input = document.getElementById(inputId);
+                const btn = document.getElementById(toggleId);
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                btn.textContent = isPassword ? '🙈' : '👁️';
+            });
+        }
+        setupPwdToggle('pwd-toggle1', 'password');
+        setupPwdToggle('pwd-toggle2', 'confirm-password');
+    </script>
+</body>
+
+</html>

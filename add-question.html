@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Question — NEETPrep Pro Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --accent: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Toast */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 280px;
+            max-width: 360px;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .14);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: .9rem;
+            font-weight: 500;
+            animation: toastIn .35s cubic-bezier(.34, 1.56, .64, 1) forwards;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--accent);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(0)
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+        }
+
+        /* Loading */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, .85);
+            backdrop-filter: blur(4px);
+            z-index: 8888;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* Admin Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--secondary);
+            padding: 0 5%;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: #fff;
+        }
+
+        .nav-logo .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: .9rem;
+        }
+
+        .admin-badge {
+            font-size: .7rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 100px;
+            background: rgba(239, 68, 68, .2);
+            color: #fca5a5;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 2px;
+        }
+
+        .nav-link {
+            padding: 8px 13px;
+            border-radius: 8px;
+            font-size: .87rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, .6);
+            transition: background .2s, color .2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, .1);
+            color: #fff;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .avatar-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 9px;
+            transition: background .2s;
+        }
+
+        .avatar-btn:hover {
+            background: rgba(255, 255, 255, .1);
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .87rem;
+        }
+
+        .avatar-name {
+            font-size: .87rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, .85);
+            max-width: 110px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dropdown-wrap {
+            position: relative;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            min-width: 180px;
+            padding: 8px;
+            z-index: 200;
+            display: none;
+        }
+
+        .dropdown.open {
+            display: block;
+            animation: fadeDown .2s ease;
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: .87rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg);
+        }
+
+        .dropdown-item.danger {
+            color: var(--danger);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 5px 0;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            background: none;
+            border: none;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            inset: 64px 0 0;
+            background: var(--secondary);
+            z-index: 99;
+            padding: 20px 5%;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mobile-nav.open {
+            display: flex;
+        }
+
+        .mobile-nav .nav-link {
+            padding: 12px 16px;
+            font-size: 1rem;
+        }
+
+        /* Page */
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 36px 5% 64px;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 28px;
+            align-items: start;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .82rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .breadcrumb span {
+            color: var(--border);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: .9rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        /* Form card */
+        .form-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 18px;
+            padding: 32px;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 24px 0;
+        }
+
+        .form-section-title {
+            font-size: .82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: .88rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 7px;
+        }
+
+        .form-group label .required {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-group label .hint {
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: .78rem;
+            margin-left: 6px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        input[type=text],
+        select,
+        textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .92rem;
+            background: var(--bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        input[type=text]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+            background: var(--surface);
+        }
+
+        input.error,
+        select.error,
+        textarea.error {
+            border-color: var(--danger);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.6;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .field-error {
+            font-size: .79rem;
+            color: var(--danger);
+            margin-top: 5px;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .field-error.show {
+            display: flex;
+        }
+
+        /* Options grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .option-label-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 7px;
+        }
+
+        .option-letter-badge {
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: .82rem;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .badge-a {
+            background: #2563eb;
+        }
+
+        .badge-b {
+            background: #9333ea;
+        }
+
+        .badge-c {
+            background: #16a34a;
+        }
+
+        .badge-d {
+            background: #ea580c;
+        }
+
+        /* Correct answer radio */
+        .answer-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .answer-radio {
+            display: none;
+        }
+
+        .answer-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: .9rem;
+            font-weight: 600;
+            transition: all .2s;
+            user-select: none;
+        }
+
+        .answer-label:hover {
+            border-color: var(--primary);
+        }
+
+        .answer-radio:checked+.answer-label {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .ans-letter {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: .8rem;
+            font-weight: 800;
+        }
+
+        /* Image upload — Base64 */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.drag-over {
+            border-color: var(--primary);
+            background: #f0f7ff;
+        }
+
+        .upload-zone input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            pointer-events: none;
+        }
+
+        .upload-text {
+            font-size: .88rem;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .upload-text strong {
+            color: var(--primary);
+        }
+
+        .upload-limit {
+            font-size: .75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            pointer-events: none;
+        }
+
+        /* Size meter */
+        .size-meter {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .size-meter-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: .75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .size-bar-bg {
+            height: 5px;
+            background: var(--border);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .size-bar-fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width .4s, background .4s;
+            background: var(--accent);
+        }
+
+        /* Image preview */
+        .image-preview-wrap {
+            display: none;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .image-preview-wrap.show {
+            display: block;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 180px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .btn-remove-img {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 8px;
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 5px 12px;
+            font-size: .79rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Form actions */
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 28px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+            min-width: 160px;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .btn-reset-form {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 22px;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .btn-reset-form:hover {
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+
+        /* Sidebar */
+        .sidebar-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: sticky;
+            top: 84px;
+        }
+
+        .sidebar-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .sidebar-card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: .9rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-card-body {
+            padding: 16px 20px;
+        }
+
+        /* No-storage notice */
+        .notice-card {
+            background: #f0fdf4;
+            border: 1.5px solid #bbf7d0;
+            border-radius: 14px;
+            padding: 16px 18px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .notice-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .notice-text {
+            font-size: .83rem;
+            line-height: 1.65;
+            color: #15803d;
+        }
+
+        .notice-text strong {
+            display: block;
+            font-size: .87rem;
+            margin-bottom: 3px;
+        }
+
+        /* Live preview */
+        .preview-question {
+            font-size: .92rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            font-weight: 500;
+            min-height: 44px;
+            padding: 10px 12px;
+            background: var(--bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .preview-options {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .preview-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 9px;
+            font-size: .87rem;
+        }
+
+        .preview-option.correct-preview {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .preview-letter {
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: .8rem;
+            font-weight: 800;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        .preview-option.correct-preview .preview-letter {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* Saved list */
+        .saved-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        .saved-item {
+            padding: 10px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+        }
+
+        .saved-item-subj {
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 100px;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .saved-item-q {
+            font-size: .83rem;
+            line-height: 1.45;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        @media(max-width:960px) {
+            .page {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-stack {
+                position: static;
+            }
+        }
+
+        @media(max-width:768px) {
+            .nav-center {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toast-container"></div>
+    <div id="loading-overlay" class="active">
+        <div class="spinner"></div>
+    </div>
+
+    <nav class="navbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div class="nav-logo">
+                <div class="logo-icon">⚡</div>NEETPrep Pro
+            </div>
+            <span class="admin-badge">Admin</span>
+        </div>
+        <div class="nav-center">
+            <a href="admin-dashboard.html" class="nav-link">Dashboard</a>
+            <a href="add-question.html" class="nav-link active">Add Question</a>
+            <a href="manage-tests.html" class="nav-link">Manage Tests</a>
+            <a href="dashboard.html" class="nav-link">Student View</a>
+        </div>
+        <div class="nav-right">
+            <div class="dropdown-wrap">
+                <button class="avatar-btn" id="avatar-btn">
+                    <div class="avatar" id="user-avatar">A</div>
+                    <span class="avatar-name" id="user-name-nav">Admin</span>
+                    <span style="color:rgba(255,255,255,.5);font-size:.8rem;">▾</span>
+                </button>
+                <div class="dropdown" id="nav-dropdown">
+                    <a href="admin-dashboard.html" class="dropdown-item">📊 Admin Dashboard</a>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item danger" id="btn-logout">🚪 Log Out</div>
+                </div>
+            </div>
+        </div>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </nav>
+    <div class="mobile-nav" id="mobile-nav">
+        <a href="admin-dashboard.html" class="nav-link">📊 Dashboard</a>
+        <a href="add-question.html" class="nav-link active">➕ Add Question</a>
+        <a href="manage-tests.html" class="nav-link">📋 Manage Tests</a>
+        <div style="height:1px;background:rgba(255,255,255,.1);margin:8px 0;"></div>
+        <div class="nav-link" id="mobile-logout" style="color:#fca5a5;cursor:pointer;">🚪 Log Out</div>
+    </div>
+
+    <div class="page">
+
+        <!-- ── Left: Form ── -->
+        <div>
+            <div class="breadcrumb">
+                <a href="admin-dashboard.html">Admin</a><span>/</span><span>Add Question</span>
+            </div>
+            <div class="page-title">➕ Add Question</div>
+            <div class="page-subtitle">
+                Create a new MCQ for the question bank. Images are converted to Base64 and stored
+                in the Realtime Database — no paid Firebase Storage plan required.
+            </div>
+
+            <div class="form-card">
+                <form id="question-form" novalidate>
+
+                    <!-- Classification -->
+                    <div class="form-section-title">📌 Classification</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="subject">Subject <span class="required">*</span></label>
+                            <select id="subject">
+                                <option value="">Select subject…</option>
+                                <option value="Physics">⚡ Physics</option>
+                                <option value="Chemistry">🧪 Chemistry</option>
+                                <option value="Biology">🧬 Biology</option>
+                            </select>
+                            <div class="field-error" id="subject-error">⚠ Subject is required.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="difficulty">Difficulty <span class="required">*</span></label>
+                            <select id="difficulty">
+                                <option value="">Select difficulty…</option>
+                                <option value="Easy">🟢 Easy</option>
+                                <option value="Medium">🟡 Medium</option>
+                                <option value="Hard">🔴 Hard</option>
+                            </select>
+                            <div class="field-error" id="difficulty-error">⚠ Difficulty is required.</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="chapter">Chapter <span class="required">*</span> <span class="hint">(e.g. Laws of Motion)</span></label>
+                            <input type="text" id="chapter" placeholder="Chapter name" autocomplete="off" />
+                            <div class="field-error" id="chapter-error">⚠ Chapter is required.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="topic">Topic <span class="required">*</span> <span class="hint">(e.g. Newton's 2nd Law)</span></label>
+                            <input type="text" id="topic" placeholder="Topic name" autocomplete="off" />
+                            <div class="field-error" id="topic-error">⚠ Topic is required.</div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <!-- Question Text -->
+                    <div class="form-section-title">❓ Question</div>
+                    <div class="form-group">
+                        <label for="question-text">Question Text <span class="required">*</span></label>
+                        <textarea id="question-text" placeholder="Type the full question here…" rows="4"></textarea>
+                        <div class="field-error" id="qtext-error">⚠ Question text is required.</div>
+                    </div>
+
+                    <!-- Image Upload — Base64, no Firebase Storage -->
+                    <div class="form-group">
+                        <label>
+                            Question Image
+                            <span class="hint">(optional · Base64 · max 200 KB · JPEG / PNG / WebP)</span>
+                        </label>
+                        <div class="upload-zone" id="upload-zone">
+                            <input type="file" id="img-upload" accept="image/jpeg,image/png,image/gif,image/webp" />
+                            <div class="upload-icon">🖼️</div>
+                            <div class="upload-text"><strong>Click to upload</strong> or drag & drop</div>
+                            <div class="upload-limit">Image is stored as Base64 in the database. Keep under 200 KB.</div>
+                        </div>
+
+                        <!-- Size meter shown after file selection -->
+                        <div class="size-meter" id="size-meter">
+                            <div class="size-meter-row">
+                                <span id="size-label">0 KB used</span>
+                                <span style="color:var(--text-muted);">200 KB limit</span>
+                            </div>
+                            <div class="size-bar-bg">
+                                <div class="size-bar-fill" id="size-bar-fill" style="width:0%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Preview -->
+                        <div class="image-preview-wrap" id="preview-wrap">
+                            <img class="image-preview" id="img-preview" src="" alt="Uploaded preview" />
+                            <br />
+                            <button type="button" class="btn-remove-img" id="btn-remove-img">✕ Remove Image</button>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <!-- Options -->
+                    <div class="form-section-title">🔤 Answer Options</div>
+                    <div class="options-grid">
+                        <div class="form-group">
+                            <div class="option-label-row">
+                                <div class="option-letter-badge badge-a">A</div>
+                                <label for="opt-a">Option A <span class="required">*</span></label>
+                            </div>
+                            <input type="text" id="opt-a" placeholder="Option A text" />
+                            <div class="field-error" id="opta-error">⚠ Required.</div>
+                        </div>
+                        <div class="form-group">
+                            <div class="option-label-row">
+                                <div class="option-letter-badge badge-b">B</div>
+                                <label for="opt-b">Option B <span class="required">*</span></label>
+                            </div>
+                            <input type="text" id="opt-b" placeholder="Option B text" />
+                            <div class="field-error" id="optb-error">⚠ Required.</div>
+                        </div>
+                        <div class="form-group">
+                            <div class="option-label-row">
+                                <div class="option-letter-badge badge-c">C</div>
+                                <label for="opt-c">Option C <span class="required">*</span></label>
+                            </div>
+                            <input type="text" id="opt-c" placeholder="Option C text" />
+                            <div class="field-error" id="optc-error">⚠ Required.</div>
+                        </div>
+                        <div class="form-group">
+                            <div class="option-label-row">
+                                <div class="option-letter-badge badge-d">D</div>
+                                <label for="opt-d">Option D <span class="required">*</span></label>
+                            </div>
+                            <input type="text" id="opt-d" placeholder="Option D text" />
+                            <div class="field-error" id="optd-error">⚠ Required.</div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <!-- Correct Answer -->
+                    <div class="form-section-title">✅ Correct Answer</div>
+                    <div class="form-group">
+                        <label>Select the correct option <span class="required">*</span></label>
+                        <div class="answer-options">
+                            <input type="radio" class="answer-radio" name="correct" id="ans-a" value="A" />
+                            <label class="answer-label" for="ans-a"><span class="ans-letter">A</span> Option A</label>
+                            <input type="radio" class="answer-radio" name="correct" id="ans-b" value="B" />
+                            <label class="answer-label" for="ans-b"><span class="ans-letter">B</span> Option B</label>
+                            <input type="radio" class="answer-radio" name="correct" id="ans-c" value="C" />
+                            <label class="answer-label" for="ans-c"><span class="ans-letter">C</span> Option C</label>
+                            <input type="radio" class="answer-radio" name="correct" id="ans-d" value="D" />
+                            <label class="answer-label" for="ans-d"><span class="ans-letter">D</span> Option D</label>
+                        </div>
+                        <div class="field-error" id="answer-error" style="margin-top:8px;">⚠ Please select the correct answer.</div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" id="btn-submit">
+                            <span id="btn-submit-text">💾 Save Question</span>
+                        </button>
+                        <button type="button" class="btn-reset-form" id="btn-reset">↺ Reset Form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ── Right Sidebar ── -->
+        <div class="sidebar-stack">
+
+            <!-- No-storage notice -->
+            <div class="notice-card">
+                <span class="notice-icon">✅</span>
+                <div class="notice-text">
+                    <strong>No Firebase Storage needed</strong>
+                    Images upload as Base64 strings and are saved directly in the Realtime Database.
+                    The free Spark plan is fully sufficient. Keep images under 200 KB for best performance.
+                </div>
+            </div>
+
+            <!-- Live Preview -->
+            <div class="sidebar-card">
+                <div class="sidebar-card-header">👁 Live Preview</div>
+                <div class="sidebar-card-body">
+                    <div class="preview-question" id="preview-q">Question text will appear here…</div>
+                    <div id="preview-img-wrap" style="display:none;margin-bottom:10px;">
+                        <img id="preview-img" src="" alt="" style="max-width:100%;max-height:110px;border-radius:7px;border:1px solid var(--border);" />
+                    </div>
+                    <div class="preview-options">
+                        <div class="preview-option" data-letter="A">
+                            <div class="preview-letter">A</div><span id="prev-a">Option A</span>
+                        </div>
+                        <div class="preview-option" data-letter="B">
+                            <div class="preview-letter">B</div><span id="prev-b">Option B</span>
+                        </div>
+                        <div class="preview-option" data-letter="C">
+                            <div class="preview-letter">C</div><span id="prev-c">Option C</span>
+                        </div>
+                        <div class="preview-option" data-letter="D">
+                            <div class="preview-letter">D</div><span id="prev-d">Option D</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Saved this session -->
+            <div class="sidebar-card">
+                <div class="sidebar-card-header">
+                    ✅ Saved This Session
+                    <span style="font-size:.75rem;font-weight:600;color:var(--text-muted);" id="saved-count">0</span>
+                </div>
+                <div class="sidebar-card-body">
+                    <div class="saved-list" id="saved-list">
+                        <p style="font-size:.85rem;color:var(--text-muted);text-align:center;padding:6px 0;">Saved questions will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import {
+            getDatabase,
+            ref,
+            get,
+            push
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        /* NOTE: No firebase-storage import — images are stored as Base64 in Realtime DB */
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA1GdFV2LYAUktkNswT4axg1fr6UrYEF48",
+            authDomain: "neetpreppro-445b2.firebaseapp.com",
+            databaseURL: "https://neetpreppro-445b2-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "neetpreppro-445b2",
+            storageBucket: "neetpreppro-445b2.firebasestorage.app",
+            messagingSenderId: "589750441567",
+            appId: "1:589750441567:web:7396b9de030374cabe2dea",
+            measurementId: "G-7SYLBDLY71"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // ── Toast ────────────────────────────────────────────────────────
+        function showToast(msg, type = 'info') {
+            const c = document.getElementById('toast-container');
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${msg}</span><button class="toast-close">✕</button>`;
+            t.querySelector('.toast-close').addEventListener('click', () => dismissToast(t));
+            c.appendChild(t);
+            setTimeout(() => dismissToast(t), 4000);
+        }
+
+        function dismissToast(t) {
+            t.style.animation = 'toastOut .3s ease forwards';
+            setTimeout(() => t.remove(), 300);
+        }
+
+        // ── Admin Guard ──────────────────────────────────────────────────
+        onAuthStateChanged(auth, async user => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                const snap = await get(ref(db, `users/${user.uid}`));
+                if (!snap.exists() || snap.val().role !== 'admin') {
+                    showToast('Access denied.', 'error');
+                    setTimeout(() => window.location.href = 'dashboard.html', 1500);
+                    return;
+                }
+                const name = user.displayName || snap.val().name || 'Admin';
+                document.getElementById('user-name-nav').textContent = name.split(' ')[0];
+                document.getElementById('user-avatar').textContent = name[0].toUpperCase();
+                document.getElementById('loading-overlay').classList.remove('active');
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loading-overlay').classList.remove('active');
+                showToast('Failed to verify admin.', 'error');
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // BASE64 IMAGE HANDLING
+        // Images are read with FileReader, converted to data: URL strings,
+        // and stored directly in /questions/{qid}/imageUrl in Realtime DB.
+        // This completely avoids Firebase Storage and its billing requirements.
+        // ═══════════════════════════════════════════════════════════════
+
+        const MAX_BYTES = 200 * 1024; // 200 KB hard limit
+        let base64ImageData = null; // null or "data:image/jpeg;base64,..."
+
+        const uploadZone = document.getElementById('upload-zone');
+        const imgInput = document.getElementById('img-upload');
+        const previewWrap = document.getElementById('preview-wrap');
+        const imgPreview = document.getElementById('img-preview');
+        const sizeMeter = document.getElementById('size-meter');
+        const sizeLabel = document.getElementById('size-label');
+        const sizeFill = document.getElementById('size-bar-fill');
+
+        /**
+         * Validates the selected image and converts it to a Base64 data URL.
+         * Enforces a 200 KB ceiling. Displays a size indicator bar.
+         */
+        function handleImageFile(file) {
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                showToast('Please select an image file (JPEG, PNG, WebP, GIF).', 'error');
+                return;
+            }
+            // Reject before reading if raw file already exceeds limit
+            if (file.size > MAX_BYTES) {
+                showToast(`Image is ${Math.round(file.size/1024)} KB — please use an image under 200 KB.`, 'error');
+                imgInput.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const dataUrl = ev.target.result;
+                // Base64 string is ~37% larger than raw bytes; check final size too
+                if (dataUrl.length > MAX_BYTES * 1.4) {
+                    showToast('Encoded image exceeds 200 KB. Please compress or resize it.', 'error');
+                    imgInput.value = '';
+                    return;
+                }
+
+                base64ImageData = dataUrl;
+
+                // Update size bar
+                const kb = Math.round(dataUrl.length / 1024);
+                const pct = Math.min(100, Math.round((dataUrl.length / (MAX_BYTES * 1.37)) * 100));
+                sizeLabel.textContent = `${kb} KB used`;
+                sizeFill.style.width = `${pct}%`;
+                sizeFill.style.background = pct > 85 ? 'var(--warning)' : 'var(--accent)';
+                sizeMeter.style.display = 'block';
+
+                // Show main preview
+                imgPreview.src = dataUrl;
+                previewWrap.classList.add('show');
+
+                // Mirror into live preview sidebar
+                document.getElementById('preview-img').src = dataUrl;
+                document.getElementById('preview-img-wrap').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        imgInput.addEventListener('change', e => handleImageFile(e.target.files[0]));
+
+        // Drag & drop support
+        uploadZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+        uploadZone.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            handleImageFile(e.dataTransfer.files[0]);
+        });
+
+        // Remove image
+        document.getElementById('btn-remove-img').addEventListener('click', () => {
+            base64ImageData = null;
+            imgInput.value = '';
+            imgPreview.src = '';
+            previewWrap.classList.remove('show');
+            sizeMeter.style.display = 'none';
+            document.getElementById('preview-img').src = '';
+            document.getElementById('preview-img-wrap').style.display = 'none';
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // LIVE PREVIEW
+        // ═══════════════════════════════════════════════════════════════
+        function updatePreview() {
+            const qText = document.getElementById('question-text').value.trim();
+            document.getElementById('preview-q').textContent = qText || 'Question text will appear here…';
+
+            ['A', 'B', 'C', 'D'].forEach(l => {
+                const val = document.getElementById(`opt-${l.toLowerCase()}`).value.trim();
+                document.getElementById(`prev-${l.toLowerCase()}`).textContent = val || `Option ${l}`;
+            });
+
+            const correct = document.querySelector('input[name="correct"]:checked');
+            document.querySelectorAll('.preview-option').forEach(opt => {
+                opt.classList.toggle('correct-preview', !!(correct && opt.dataset.letter === correct.value));
+            });
+        }
+
+        ['question-text', 'opt-a', 'opt-b', 'opt-c', 'opt-d'].forEach(id =>
+            document.getElementById(id).addEventListener('input', updatePreview)
+        );
+        document.querySelectorAll('.answer-radio').forEach(r => r.addEventListener('change', updatePreview));
+
+        // ═══════════════════════════════════════════════════════════════
+        // FIELD VALIDATION
+        // ═══════════════════════════════════════════════════════════════
+        function showErr(id, show = true) {
+            document.getElementById(id).classList.toggle('show', show);
+        }
+
+        function markErr(id, err = true) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('error', err);
+        }
+
+        function clearAllErrors() {
+            ['subject', 'difficulty', 'chapter', 'topic', 'question-text', 'opt-a', 'opt-b', 'opt-c', 'opt-d']
+            .forEach(id => markErr(id, false));
+            ['subject-error', 'difficulty-error', 'chapter-error', 'topic-error', 'qtext-error',
+                'opta-error', 'optb-error', 'optc-error', 'optd-error', 'answer-error'
+            ]
+            .forEach(id => showErr(id, false));
+        }
+
+        function validate() {
+            clearAllErrors();
+            let ok = true;
+            const v = id => document.getElementById(id).value.trim();
+            if (!v('subject')) {
+                markErr('subject');
+                showErr('subject-error');
+                ok = false;
+            }
+            if (!v('difficulty')) {
+                markErr('difficulty');
+                showErr('difficulty-error');
+                ok = false;
+            }
+            if (!v('chapter')) {
+                markErr('chapter');
+                showErr('chapter-error');
+                ok = false;
+            }
+            if (!v('topic')) {
+                markErr('topic');
+                showErr('topic-error');
+                ok = false;
+            }
+            if (!v('question-text')) {
+                markErr('question-text');
+                showErr('qtext-error');
+                ok = false;
+            }
+            if (!v('opt-a')) {
+                markErr('opt-a');
+                showErr('opta-error');
+                ok = false;
+            }
+            if (!v('opt-b')) {
+                markErr('opt-b');
+                showErr('optb-error');
+                ok = false;
+            }
+            if (!v('opt-c')) {
+                markErr('opt-c');
+                showErr('optc-error');
+                ok = false;
+            }
+            if (!v('opt-d')) {
+                markErr('opt-d');
+                showErr('optd-error');
+                ok = false;
+            }
+            if (!document.querySelector('input[name="correct"]:checked')) {
+                showErr('answer-error');
+                ok = false;
+            }
+            return ok;
+        }
+
+        // Auto-clear errors on input
+        const errMap = {
+            'subject': 'subject-error',
+            'difficulty': 'difficulty-error',
+            'chapter': 'chapter-error',
+            'topic': 'topic-error',
+            'question-text': 'qtext-error',
+            'opt-a': 'opta-error',
+            'opt-b': 'optb-error',
+            'opt-c': 'optc-error',
+            'opt-d': 'optd-error'
+        };
+        Object.entries(errMap).forEach(([fieldId, errId]) => {
+            const el = document.getElementById(fieldId);
+            const ev = el.tagName === 'SELECT' ? 'change' : 'input';
+            el.addEventListener(ev, () => {
+                markErr(fieldId, false);
+                showErr(errId, false);
+            });
+        });
+        document.querySelectorAll('.answer-radio').forEach(r => {
+            r.addEventListener('change', () => showErr('answer-error', false));
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // FORM SUBMIT
+        // ═══════════════════════════════════════════════════════════════
+        let sessionSaved = [];
+
+        function addToSavedList(q) {
+            sessionSaved.unshift(q);
+            document.getElementById('saved-count').textContent = sessionSaved.length;
+            const pillStyle = {
+                Physics: 'background:#eff6ff;color:#2563eb',
+                Chemistry: 'background:#fdf4ff;color:#9333ea',
+                Biology: 'background:#f0fdf4;color:#16a34a'
+            };
+            document.getElementById('saved-list').innerHTML = sessionSaved.slice(0, 8).map(sq => `
+        <div class="saved-item">
+          <span class="saved-item-subj" style="${pillStyle[sq.subject]||'background:#f1f5f9;color:#64748b'}">${sq.subject}</span>
+          <div class="saved-item-q">${sq.questionText}</div>
+        </div>
+      `).join('');
+        }
+
+        const form = document.getElementById('question-form');
+        const btnSubmit = document.getElementById('btn-submit');
+        const btnText = document.getElementById('btn-submit-text');
+
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            if (!validate()) return;
+
+            btnSubmit.disabled = true;
+            btnText.textContent = 'Saving…';
+
+            try {
+                /**
+                 * imageUrl is either:
+                 *   null        — question has no image
+                 *   "data:..."  — Base64 encoded image string stored in Realtime DB
+                 *
+                 * <img src="data:..."> works natively in all browsers, so the exam
+                 * and review pages display these images without any extra code.
+                 */
+                const question = {
+                    subject: document.getElementById('subject').value,
+                    chapter: document.getElementById('chapter').value.trim(),
+                    topic: document.getElementById('topic').value.trim(),
+                    difficulty: document.getElementById('difficulty').value,
+                    questionText: document.getElementById('question-text').value.trim(),
+                    imageUrl: base64ImageData, // null or Base64 data URL
+                    options: {
+                        A: document.getElementById('opt-a').value.trim(),
+                        B: document.getElementById('opt-b').value.trim(),
+                        C: document.getElementById('opt-c').value.trim(),
+                        D: document.getElementById('opt-d').value.trim(),
+                    },
+                    correctAnswer: document.querySelector('input[name="correct"]:checked').value,
+                    createdBy: auth.currentUser.uid,
+                    createdAt: Date.now()
+                };
+
+                await push(ref(db, 'questions'), question);
+                showToast('Question saved successfully!', 'success');
+                addToSavedList(question);
+                resetForm();
+
+            } catch (err) {
+                console.error(err);
+                if (err.message?.includes('offline') || err.code === 'unavailable') {
+                    showToast('You appear to be offline. Check your connection.', 'error');
+                } else {
+                    showToast('Failed to save question. Please try again.', 'error');
+                }
+            } finally {
+                btnSubmit.disabled = false;
+                btnText.textContent = '💾 Save Question';
+            }
+        });
+
+        function resetForm() {
+            document.getElementById('question-form').reset();
+            base64ImageData = null;
+            imgPreview.src = '';
+            previewWrap.classList.remove('show');
+            sizeMeter.style.display = 'none';
+            document.getElementById('preview-img').src = '';
+            document.getElementById('preview-img-wrap').style.display = 'none';
+            clearAllErrors();
+            updatePreview();
+        }
+        document.getElementById('btn-reset').addEventListener('click', resetForm);
+
+        // ── Navbar ──────────────────────────────────────────────────────
+        const avatarBtn = document.getElementById('avatar-btn');
+        const dropdown = document.getElementById('nav-dropdown');
+        avatarBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            dropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', () => dropdown.classList.remove('open'));
+
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (err) {
+                console.error(err);
+                showToast('Logout failed.', 'error');
+            }
+        }
+        document.getElementById('btn-logout').addEventListener('click', handleLogout);
+        document.getElementById('mobile-logout').addEventListener('click', handleLogout);
+
+        const hb = document.getElementById('hamburger');
+        const mn = document.getElementById('mobile-nav');
+        hb.addEventListener('click', () => mn.classList.toggle('open'));
+        document.addEventListener('click', e => {
+            if (!hb.contains(e.target) && !mn.contains(e.target)) mn.classList.remove('open');
+        });
+    </script>
+</body>
+
+</html>

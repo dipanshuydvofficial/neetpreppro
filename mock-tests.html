@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mock Tests — NEETPrep Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --accent: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 280px;
+            max-width: 360px;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: .9rem;
+            font-weight: 500;
+            animation: toastIn .35s cubic-bezier(.34, 1.56, .64, 1) forwards;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--accent);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(0)
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+        }
+
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, .8);
+            backdrop-filter: blur(4px);
+            z-index: 8888;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 5%;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .nav-logo .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .nav-logo span {
+            color: var(--primary);
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-link {
+            padding: 8px 14px;
+            border-radius: 9px;
+            font-size: .9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: background .2s, color .2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(37, 99, 235, .08);
+            color: var(--primary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background .2s;
+        }
+
+        .avatar-btn:hover {
+            background: var(--bg);
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .9rem;
+        }
+
+        .avatar-name {
+            font-size: .88rem;
+            font-weight: 600;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dropdown-wrap {
+            position: relative;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            min-width: 190px;
+            padding: 8px;
+            z-index: 200;
+            display: none;
+        }
+
+        .dropdown.open {
+            display: block;
+            animation: fadeDown .2s ease;
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: .88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg);
+        }
+
+        .dropdown-item.danger {
+            color: var(--danger);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 6px 0;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            background: none;
+            border: none;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 2px;
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            inset: 68px 0 0;
+            background: var(--surface);
+            z-index: 99;
+            padding: 20px 5%;
+            flex-direction: column;
+            gap: 4px;
+            border-top: 1px solid var(--border);
+        }
+
+        .mobile-nav.open {
+            display: flex;
+        }
+
+        .mobile-nav .nav-link {
+            padding: 12px 16px;
+            font-size: 1rem;
+        }
+
+        /* Page */
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 36px 5% 60px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .83rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .breadcrumb span {
+            color: var(--border);
+        }
+
+        .page-header {
+            margin-bottom: 36px;
+        }
+
+        .page-header h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+        }
+
+        .page-header p {
+            font-size: .95rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            max-width: 540px;
+            line-height: 1.7;
+        }
+
+        /* Info Banner */
+        .info-banner {
+            background: linear-gradient(135deg, var(--secondary), #1e3a5f);
+            border-radius: 20px;
+            padding: 32px 36px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .info-banner::after {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, .15);
+        }
+
+        .banner-content {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .banner-content h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .banner-content p {
+            font-size: .9rem;
+            color: rgba(255, 255, 255, .65);
+            line-height: 1.7;
+            max-width: 480px;
+        }
+
+        .banner-stats {
+            display: flex;
+            gap: 28px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .banner-stat {
+            text-align: left;
+        }
+
+        .banner-stat strong {
+            display: block;
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .banner-stat span {
+            font-size: .78rem;
+            color: rgba(255, 255, 255, .5);
+        }
+
+        .banner-illustration {
+            font-size: 4rem;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+
+        /* Marking Scheme Card */
+        .marking-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .marking-title {
+            font-size: .85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 14px;
+        }
+
+        .marking-grid {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .marking-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+        }
+
+        .mark-sign {
+            font-size: 1.1rem;
+            font-weight: 800;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .mark-sign.plus {
+            color: var(--accent);
+        }
+
+        .mark-sign.minus {
+            color: var(--danger);
+        }
+
+        .mark-sign.zero {
+            color: var(--text-muted);
+        }
+
+        .mark-desc {
+            font-size: .84rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Section title */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title span {
+            font-size: .82rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        /* Mock Test Card — large, prominent */
+        .mocks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .mock-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s, border-color .2s;
+        }
+
+        .mock-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, .1);
+            border-color: rgba(37, 99, 235, .25);
+        }
+
+        .mock-card-banner {
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), #7c3aed);
+        }
+
+        .mock-card-body {
+            padding: 24px;
+        }
+
+        .mock-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+
+        .mock-number {
+            font-size: .75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 100px;
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+        .mock-difficulty {
+            font-size: .75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 100px;
+        }
+
+        .diff-easy {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .diff-medium {
+            background: #fef9c3;
+            color: #ca8a04;
+        }
+
+        .diff-hard {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .mock-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            line-height: 1.35;
+        }
+
+        .mock-desc {
+            font-size: .85rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+            margin-bottom: 18px;
+        }
+
+        .mock-specs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .spec-item {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+
+        .spec-label {
+            font-size: .73rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .subject-coverage {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .cov-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: .78rem;
+            font-weight: 600;
+        }
+
+        .cov-physics {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .cov-chemistry {
+            background: #fdf4ff;
+            color: #9333ea;
+        }
+
+        .cov-biology {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .mock-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .attempt-meta {
+            font-size: .8rem;
+            color: var(--text-muted);
+        }
+
+        .btn-start-mock {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+            text-decoration: none;
+        }
+
+        .btn-start-mock:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Past scores */
+        .best-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: .8rem;
+            font-weight: 700;
+        }
+
+        .best-score.high {
+            color: var(--accent);
+        }
+
+        .best-score.mid {
+            color: var(--warning);
+        }
+
+        .best-score.low {
+            color: var(--danger);
+        }
+
+        .empty-state {
+            padding: 72px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .empty-state svg {
+            opacity: .3;
+        }
+
+        .empty-state h4 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            font-size: .88rem;
+            color: var(--text-muted);
+            max-width: 280px;
+        }
+
+        @media(max-width:768px) {
+            .nav-center {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .info-banner {
+                flex-direction: column;
+                gap: 16px;
+                padding: 24px;
+            }
+
+            .banner-illustration {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toast-container"></div>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon">⚡</div>NEET<span>Prep</span> Pro
+        </a>
+        <div class="nav-center">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="topic-tests.html" class="nav-link">Topic Tests</a>
+            <a href="chapter-tests.html" class="nav-link">Chapter Tests</a>
+            <a href="mock-tests.html" class="nav-link active">Mock Tests</a>
+            <a href="history.html" class="nav-link">History</a>
+        </div>
+        <div class="nav-right">
+            <div class="dropdown-wrap">
+                <button class="avatar-btn" id="avatar-btn">
+                    <div class="avatar" id="user-avatar">?</div>
+                    <span class="avatar-name" id="user-name-nav">…</span>
+                    <span style="color:var(--text-muted);font-size:.8rem;">▾</span>
+                </button>
+                <div class="dropdown" id="nav-dropdown">
+                    <a href="dashboard.html" class="dropdown-item">📊 Dashboard</a>
+                    <a href="history.html" class="dropdown-item">📋 History</a>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item danger" id="btn-logout">🚪 Log Out</div>
+                </div>
+            </div>
+        </div>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </nav>
+    <div class="mobile-nav" id="mobile-nav">
+        <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+        <a href="topic-tests.html" class="nav-link">🎯 Topic Tests</a>
+        <a href="chapter-tests.html" class="nav-link">📖 Chapter Tests</a>
+        <a href="subject-tests.html" class="nav-link">🏫 Subject Tests</a>
+        <a href="mock-tests.html" class="nav-link active">📝 Mock Tests</a>
+        <a href="history.html" class="nav-link">📋 History</a>
+        <div style="height:1px;background:var(--border);margin:8px 0;"></div>
+        <div class="nav-link" id="mobile-logout" style="color:var(--danger);cursor:pointer;">🚪 Log Out</div>
+    </div>
+
+    <div class="page">
+        <div class="page-header">
+            <div class="breadcrumb">
+                <a href="dashboard.html">Dashboard</a><span>/</span><span>Mock Tests</span>
+            </div>
+            <h1>📝 Mock Tests</h1>
+            <p>Full NEET simulation exams. 180 questions, 200 minutes, exact marking scheme — just like the real exam.</p>
+        </div>
+
+        <!-- Info Banner -->
+        <div class="info-banner">
+            <div class="banner-content">
+                <h2>NEET Exam Simulation</h2>
+                <p>Our mock tests are designed to replicate the actual NEET exam experience — same pattern, same difficulty distribution, and the same time pressure. Build stamina and strategy.</p>
+                <div class="banner-stats">
+                    <div class="banner-stat"><strong>180</strong><span>Questions</span></div>
+                    <div class="banner-stat"><strong>720</strong><span>Total Marks</span></div>
+                    <div class="banner-stat"><strong>200 min</strong><span>Duration</span></div>
+                    <div class="banner-stat"><strong>−1</strong><span>Wrong Mark</span></div>
+                </div>
+            </div>
+            <div class="banner-illustration">🎯</div>
+        </div>
+
+        <!-- Marking Scheme -->
+        <div class="marking-card">
+            <div>
+                <div class="marking-title">Marking Scheme</div>
+                <div class="marking-grid">
+                    <div class="marking-item">
+                        <span class="mark-sign plus">+4</span>
+                        <span class="mark-desc">Correct answer</span>
+                    </div>
+                    <div class="marking-item">
+                        <span class="mark-sign minus">−1</span>
+                        <span class="mark-desc">Wrong answer</span>
+                    </div>
+                    <div class="marking-item">
+                        <span class="mark-sign zero">0</span>
+                        <span class="mark-desc">Not attempted</span>
+                    </div>
+                    <div class="marking-item">
+                        <span class="mark-sign zero">0</span>
+                        <span class="mark-desc">Marked for review (not answered)</span>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-left:auto;padding:16px 20px;background:var(--bg);border-radius:12px;text-align:center;min-width:160px;">
+                <div style="font-size:.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;">SUBJECT SPLIT</div>
+                <div style="font-size:.88rem;font-weight:600;color:var(--text-primary);">⚡ Physics — 45 Qs</div>
+                <div style="font-size:.88rem;font-weight:600;color:var(--text-primary);margin-top:4px;">🧪 Chemistry — 45 Qs</div>
+                <div style="font-size:.88rem;font-weight:600;color:var(--text-primary);margin-top:4px;">🧬 Biology — 90 Qs</div>
+            </div>
+        </div>
+
+        <!-- Tests -->
+        <div class="section-title">
+            Available Mock Tests
+            <span id="test-count-label">Loading…</span>
+        </div>
+        <div class="mocks-grid" id="tests-container">
+            <!-- Skeletons -->
+            ${[1,2].map(()=>`
+            <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;">
+                <div style="height:8px;background:var(--border);"></div>
+                <div style="padding:24px;display:flex;flex-direction:column;gap:14px;">
+                    <div class="skeleton" style="width:60%;height:20px;"></div>
+                    <div class="skeleton" style="width:100%;height:16px;"></div>
+                    <div class="skeleton" style="width:80%;height:16px;"></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div class="skeleton" style="height:54px;border-radius:10px;"></div>
+                        <div class="skeleton" style="height:54px;border-radius:10px;"></div>
+                        <div class="skeleton" style="height:54px;border-radius:10px;"></div>
+                        <div class="skeleton" style="height:54px;border-radius:10px;"></div>
+                    </div>
+                    <div class="skeleton" style="width:100%;height:44px;border-radius:12px;"></div>
+                </div>
+            </div>
+            `).join('')}
+        </div>
+    </div>
+
+    <script type="module">
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import {
+            getDatabase,
+            ref,
+            get,
+            query,
+            orderByChild,
+            equalTo
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyA1GdFV2LYAUktkNswT4axg1fr6UrYEF48",
+  authDomain: "neetpreppro-445b2.firebaseapp.com",
+  databaseURL: "https://neetpreppro-445b2-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "neetpreppro-445b2",
+  storageBucket: "neetpreppro-445b2.firebasestorage.app",
+  messagingSenderId: "589750441567",
+  appId: "1:589750441567:web:7396b9de030374cabe2dea",
+  measurementId: "G-7SYLBDLY71"
+};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let currentUser = null;
+
+        function showToast(msg, type = 'info') {
+            const c = document.getElementById('toast-container');
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${msg}</span><button class="toast-close">✕</button>`;
+            t.querySelector('.toast-close').addEventListener('click', () => dismiss(t));
+            c.appendChild(t);
+            setTimeout(() => dismiss(t), 4000);
+        }
+
+        function dismiss(t) {
+            t.style.animation = 'toastOut .3s ease forwards';
+            setTimeout(() => t.remove(), 300);
+        }
+
+        onAuthStateChanged(auth, async user => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = user;
+            const n = user.displayName || 'Student';
+            document.getElementById('user-name-nav').textContent = n.split(' ')[0];
+            document.getElementById('user-avatar').textContent = n[0].toUpperCase();
+            await loadTests(user.uid);
+        });
+
+        async function loadTests(uid) {
+            try {
+                // Load mock tests + user's past attempts in parallel
+                const [testsSnap, attemptsSnap] = await Promise.all([
+                    get(query(ref(db, 'tests'), orderByChild('type'), equalTo('mock'))),
+                    get(query(ref(db, 'attempts'), orderByChild('userId'), equalTo(uid)))
+                ]);
+
+                const tests = [];
+                if (testsSnap.exists()) testsSnap.forEach(c => tests.push({
+                    id: c.key,
+                    ...c.val()
+                }));
+
+                // Build map of testId → best score for this user
+                const bestScores = {};
+                if (attemptsSnap.exists()) {
+                    attemptsSnap.forEach(c => {
+                        const v = c.val();
+                        if (v.userId === uid) {
+                            const prev = bestScores[v.testId];
+                            if (!prev || v.score > prev.score) bestScores[v.testId] = {
+                                score: v.score,
+                                attemptId: c.key
+                            };
+                        }
+                    });
+                }
+
+                document.getElementById('test-count-label').textContent = `${tests.length} mock test${tests.length!==1?'s':''} available`;
+                renderTests(tests, bestScores);
+
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to load mock tests.', 'error');
+                document.getElementById('tests-container').innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><h4>Failed to Load</h4><p>Please refresh the page.</p></div>';
+            }
+        }
+
+        function renderTests(tests, bestScores) {
+            const container = document.getElementById('tests-container');
+            if (!tests.length) {
+                container.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;">
+            <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <h4>No Mock Tests Yet</h4>
+            <p>Mock tests will appear here once the admin adds them.</p>
+          </div>
+        `;
+                return;
+            }
+
+            const diffMap = n => {
+                if (n <= 3) return {
+                    cls: 'diff-easy',
+                    lbl: 'Standard'
+                };
+                if (n <= 6) return {
+                    cls: 'diff-medium',
+                    lbl: 'Moderate'
+                };
+                return {
+                    cls: 'diff-hard',
+                    lbl: 'Advanced'
+                };
+            };
+
+            container.innerHTML = tests.map((t, i) => {
+                const qCount = (t.questionIds || []).length;
+                const maxScore = qCount * 4;
+                const duration = t.duration || 200;
+                const hours = Math.floor(duration / 60);
+                const mins = duration % 60;
+                const durLabel = hours > 0 ? `${hours}h ${mins}m` : `${mins} min`;
+                const best = bestScores[t.id];
+                const diff = diffMap(i);
+
+                let bestScoreHtml = '<span class="attempt-meta">Not attempted</span>';
+                if (best) {
+                    const pct = Math.round((best.score / maxScore) * 100);
+                    const cls = pct >= 70 ? 'high' : pct >= 40 ? 'mid' : 'low';
+                    bestScoreHtml = `<a href="result.html?attemptId=${best.attemptId}" class="best-score ${cls}">Best: ${best.score}/${maxScore} (${pct}%)</a>`;
+                }
+
+                return `
+          <div class="mock-card">
+            <div class="mock-card-banner"></div>
+            <div class="mock-card-body">
+              <div class="mock-card-top">
+                <span class="mock-number">Mock #${i+1}</span>
+                <span class="mock-difficulty ${diff.cls}">${diff.lbl}</span>
+              </div>
+              <div class="mock-title">${t.title||`NEET Mock Test ${i+1}`}</div>
+              <div class="mock-desc">${t.description||'Full-length NEET simulation with questions across Physics, Chemistry, and Biology. Complete within the time limit.'}</div>
+              <div class="mock-specs">
+                <div class="spec-item">
+                  <div class="spec-label">Questions</div>
+                  <div class="spec-value">${qCount||180}</div>
+                </div>
+                <div class="spec-item">
+                  <div class="spec-label">Duration</div>
+                  <div class="spec-value">${durLabel}</div>
+                </div>
+                <div class="spec-item">
+                  <div class="spec-label">Total Marks</div>
+                  <div class="spec-value">${maxScore||720}</div>
+                </div>
+                <div class="spec-item">
+                  <div class="spec-label">Marking</div>
+                  <div class="spec-value">+4 / −1</div>
+                </div>
+              </div>
+              <div class="subject-coverage">
+                <span class="cov-chip cov-physics">⚡ Physics: 45</span>
+                <span class="cov-chip cov-chemistry">🧪 Chemistry: 45</span>
+                <span class="cov-chip cov-biology">🧬 Biology: 90</span>
+              </div>
+              <div class="mock-card-footer">
+                ${bestScoreHtml}
+                <a href="exam.html?testId=${t.id}" class="btn-start-mock">Start Test →</a>
+              </div>
+            </div>
+          </div>
+        `;
+            }).join('');
+        }
+
+        // Avatar dropdown
+        const avatarBtn = document.getElementById('avatar-btn');
+        const dropdown = document.getElementById('nav-dropdown');
+        avatarBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            dropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', () => dropdown.classList.remove('open'));
+
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (e) {
+                console.error(e);
+                showToast('Logout failed.', 'error');
+            }
+        }
+        document.getElementById('btn-logout').addEventListener('click', handleLogout);
+        document.getElementById('mobile-logout').addEventListener('click', handleLogout);
+
+        const hb = document.getElementById('hamburger');
+        const mn = document.getElementById('mobile-nav');
+        hb.addEventListener('click', () => mn.classList.toggle('open'));
+        document.addEventListener('click', e => {
+            if (!hb.contains(e.target) && !mn.contains(e.target)) mn.classList.remove('open');
+        });
+    </script>
+</body>
+
+</html>

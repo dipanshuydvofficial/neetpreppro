@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEETPrep Pro — Crack NEET with Confidence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        /* ── Design Tokens ─────────────────────────────────────────────── */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --accent: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+        }
+
+        /* ── Reset & Base ───────────────────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Sora', sans-serif;
+            line-height: 1.2;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        /* ── Toast Notification ─────────────────────────────────────────── */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 280px;
+            max-width: 360px;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--accent);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast.info {
+            border-left-color: var(--primary);
+        }
+
+        .toast-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(60px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(60px);
+            }
+        }
+
+        /* ── Buttons ───────────────────────────────────────────────────── */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 26px;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            text-decoration: none;
+        }
+
+        .btn-ghost:hover {
+            background: var(--primary);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        /* ── Navbar ────────────────────────────────────────────────────── */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 5%;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--text-primary);
+        }
+
+        .nav-logo .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .nav-logo span {
+            color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            background: none;
+            border: none;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            inset: 68px 0 0 0;
+            background: var(--surface);
+            z-index: 99;
+            padding: 24px 5%;
+            flex-direction: column;
+            gap: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .mobile-menu.open {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ── Hero Section ──────────────────────────────────────────────── */
+        .hero {
+            min-height: calc(100vh - 68px);
+            display: flex;
+            align-items: center;
+            padding: 80px 5% 60px;
+            background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 50%, #fefce8 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+            top: -100px;
+            right: -100px;
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: 100px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+
+        .hero-badge::before {
+            content: '🎯';
+        }
+
+        .hero h1 {
+            font-size: clamp(2.4rem, 5vw, 3.6rem);
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero h1 .highlight {
+            color: var(--primary);
+            position: relative;
+        }
+
+        .hero h1 .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+            opacity: 0.6;
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 36px;
+            max-width: 480px;
+            line-height: 1.75;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .hero-stat strong {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .hero-stat span {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Hero Illustration */
+        .hero-illustration {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-card-stack {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .floating-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .floating-card.main {
+            position: relative;
+            z-index: 3;
+        }
+
+        .floating-card.sub1 {
+            position: absolute;
+            top: -24px;
+            right: -20px;
+            z-index: 2;
+            padding: 14px 18px;
+            min-width: 160px;
+            animation: float1 3s ease-in-out infinite;
+        }
+
+        .floating-card.sub2 {
+            position: absolute;
+            bottom: -24px;
+            left: -20px;
+            z-index: 2;
+            padding: 14px 18px;
+            min-width: 160px;
+            animation: float2 3.5s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes float2 {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(8px);
+            }
+        }
+
+        .card-score {
+            font-family: 'Sora', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .card-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .progress-bar-wrap {
+            margin-top: 12px;
+        }
+
+        .progress-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: var(--border);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 0.8s ease;
+        }
+
+        .pill-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--primary);
+            border-radius: 100px;
+            padding: 4px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        /* ── Features Section ──────────────────────────────────────────── */
+        .section {
+            padding: 80px 5%;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 56px;
+        }
+
+        .section-header .eyebrow {
+            display: inline-block;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .section-header h2 {
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 28px;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            cursor: default;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(37, 99, 235, 0.1);
+            border-color: rgba(37, 99, 235, 0.2);
+        }
+
+        .feature-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* ── Subjects Section ──────────────────────────────────────────── */
+        .subjects-section {
+            background: var(--secondary);
+            padding: 80px 5%;
+        }
+
+        .subjects-section .section-header h2 {
+            color: #fff;
+        }
+
+        .subjects-section .section-header p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .subjects-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .subject-card {
+            border-radius: 20px;
+            padding: 40px 32px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: default;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+        }
+
+        .subject-card.physics {
+            background: linear-gradient(135deg, #1e3a5f, #2563eb);
+        }
+
+        .subject-card.chemistry {
+            background: linear-gradient(135deg, #4a1942, #9333ea);
+        }
+
+        .subject-card.biology {
+            background: linear-gradient(135deg, #14532d, #16a34a);
+        }
+
+        .subject-card::after {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .subject-emoji {
+            font-size: 2.8rem;
+            margin-bottom: 16px;
+        }
+
+        .subject-card h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .subject-card p {
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.72);
+            margin-bottom: 20px;
+            line-height: 1.65;
+        }
+
+        .subject-chapters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chapter-pill {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border-radius: 100px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* ── How It Works Section ──────────────────────────────────────── */
+        .how-section {
+            background: #fff;
+            padding: 80px 5%;
+        }
+
+        .steps-grid {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0;
+            position: relative;
+        }
+
+        .steps-grid::before {
+            content: '';
+            position: absolute;
+            top: 28px;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            opacity: 0.3;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-num {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        .step h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .step p {
+            font-size: 0.87rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ── CTA Banner ────────────────────────────────────────────────── */
+        .cta-section {
+            padding: 80px 5%;
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(1.8rem, 3vw, 2.4rem);
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        .cta-section p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            margin-bottom: 36px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-white {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: #fff;
+            color: var(--primary);
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ── Footer ────────────────────────────────────────────────────── */
+        footer {
+            background: var(--secondary);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 56px 5% 32px;
+        }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand .nav-logo {
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand p {
+            font-size: 0.88rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.55);
+            max-width: 280px;
+        }
+
+        .footer-col h4 {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-col ul li a {
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.55);
+            transition: color 0.2s;
+        }
+
+        .footer-col ul li a:hover {
+            color: #fff;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.83rem;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer-bottom a {
+            color: rgba(255, 255, 255, 0.55);
+            transition: color 0.2s;
+        }
+
+        .footer-bottom a:hover {
+            color: #fff;
+        }
+
+        /* ── Responsive ────────────────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-illustration {
+                display: none;
+            }
+
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .steps-grid::before {
+                display: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-actions {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hero {
+                padding: 48px 5% 48px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+            }
+
+            .hero-actions a {
+                text-align: center;
+                justify-content: center;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── Toast Container ──────────────────────────────────────────── -->
+    <div id="toast-container"></div>
+
+    <!-- ── Navbar ───────────────────────────────────────────────────── -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon">⚡</div>
+            NEET<span>Prep</span> Pro
+        </a>
+        <div class="nav-actions">
+            <a href="login.html" class="btn-ghost" style="padding:9px 22px;font-size:0.9rem;">Log In</a>
+            <a href="signup.html" class="btn-primary" style="padding:10px 22px;font-size:0.9rem;">Get Started Free</a>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- ── Mobile Menu ──────────────────────────────────────────────── -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="login.html">Log In</a>
+        <a href="signup.html" class="btn-primary" style="text-align:center;margin-top:8px;">Get Started Free</a>
+    </div>
+
+    <!-- ── Hero Section ─────────────────────────────────────────────── -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-badge">India's #1 NEET Practice Platform</div>
+                <h1>
+                    Ace NEET with<br />
+                    <span class="highlight">Smart Practice</span>
+                </h1>
+                <p class="hero-desc">
+                    Topic tests, chapter tests, full mock exams — all mapped to the latest NEET syllabus.
+                    Track your progress, review mistakes, and crack the exam with confidence.
+                </p>
+                <div class="hero-actions">
+                    <a href="signup.html" class="btn-primary">Start Practicing Free →</a>
+                    <a href="login.html" class="btn-ghost">Log In</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <strong>10,000+</strong>
+                        <span>Practice Questions</span>
+                    </div>
+                    <div class="hero-stat">
+                        <strong>500+</strong>
+                        <span>Curated Tests</span>
+                    </div>
+                    <div class="hero-stat">
+                        <strong>50,000+</strong>
+                        <span>Students Trained</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Card Illustration -->
+            <div class="hero-illustration">
+                <div class="hero-card-stack">
+                    <!-- Sub Card 1 — top right -->
+                    <div class="floating-card sub1">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                            <span style="font-size:1.1rem;">🏆</span>
+                            <span style="font-size:0.78rem;font-weight:600;color:var(--text-muted);">Today's Rank</span>
+                        </div>
+                        <div class="card-score" style="font-size:1.5rem;">#42</div>
+                    </div>
+
+                    <!-- Main Card -->
+                    <div class="floating-card main">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
+                            <div>
+                                <div class="card-label">Mock Test Score</div>
+                                <div class="card-score">640 / 720</div>
+                            </div>
+                            <span style="background:#dcfce7;color:#16a34a;border-radius:8px;padding:4px 10px;font-size:0.78rem;font-weight:700;">88.9%</span>
+                        </div>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-label"><span>Physics</span><span>72%</span></div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width:72%;background:#2563eb;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-bar-wrap" style="margin-top:10px;">
+                            <div class="progress-bar-label"><span>Chemistry</span><span>85%</span></div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width:85%;background:#9333ea;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-bar-wrap" style="margin-top:10px;">
+                            <div class="progress-bar-label"><span>Biology</span><span>96%</span></div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width:96%;background:#16a34a;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap;">
+                            <span class="pill-tag">✓ 152 Correct</span>
+                            <span class="pill-tag" style="background:rgba(239,68,68,0.08);color:#ef4444;">✗ 18 Wrong</span>
+                        </div>
+                    </div>
+
+                    <!-- Sub Card 2 — bottom left -->
+                    <div class="floating-card sub2">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                            <span style="font-size:1.1rem;">⏱️</span>
+                            <span style="font-size:0.78rem;font-weight:600;color:var(--text-muted);">Avg Response</span>
+                        </div>
+                        <div class="card-score" style="font-size:1.5rem;">42s</div>
+                        <div class="card-label">per question</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Features Section ──────────────────────────────────────────── -->
+    <section class="section">
+        <div class="section-header">
+            <span class="eyebrow">Why NEETPrep Pro?</span>
+            <h2>Everything You Need to Crack NEET</h2>
+            <p>A complete exam preparation ecosystem — structured, data-driven, and student-focused.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#eff6ff;">🎯</div>
+                <h3>Topic-wise Tests</h3>
+                <p>Practice individual topics in laser-focused sessions. Identify weak areas early and improve with targeted practice.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#f0fdf4;">📋</div>
+                <h3>Full Mock Tests</h3>
+                <p>Simulate the real NEET experience — 180 questions, 200 minutes, negative marking. Timed to perfection.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#fdf4ff;">📊</div>
+                <h3>Performance Analytics</h3>
+                <p>Track your scores, accuracy trends, and subject-wise strengths with clear visual dashboards.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#fffbeb;">🔖</div>
+                <h3>Smart Bookmarks</h3>
+                <p>Save tricky questions for later review. Your personal revision bank — always accessible.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#fff1f2;">⏱️</div>
+                <h3>Realistic Exam Timer</h3>
+                <p>Practice under exam-like time pressure. Auto-submit, countdown alerts, and question palette included.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#f0fdfa;">🔄</div>
+                <h3>Detailed Answer Review</h3>
+                <p>After every test, review every question — your answer vs correct answer, with filters for easy analysis.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Subjects Section ──────────────────────────────────────────── -->
+    <section class="subjects-section">
+        <div class="section-header">
+            <span class="eyebrow" style="color:rgba(255,255,255,0.5);">Full NEET Syllabus</span>
+            <h2>3 Subjects. Complete Coverage.</h2>
+            <p>Curated question banks mapped to every chapter and topic in the official NEET syllabus.</p>
+        </div>
+        <div class="subjects-grid">
+            <div class="subject-card physics">
+                <div class="subject-emoji">⚡</div>
+                <h3>Physics</h3>
+                <p>From Mechanics to Modern Physics — master all 29 chapters with concept-focused questions and detailed solutions.</p>
+                <div class="subject-chapters">
+                    <span class="chapter-pill">Laws of Motion</span>
+                    <span class="chapter-pill">Thermodynamics</span>
+                    <span class="chapter-pill">Optics</span>
+                    <span class="chapter-pill">Electrostatics</span>
+                    <span class="chapter-pill">+25 more</span>
+                </div>
+            </div>
+            <div class="subject-card chemistry">
+                <div class="subject-emoji">🧪</div>
+                <h3>Chemistry</h3>
+                <p>Physical, Inorganic & Organic Chemistry — structured tests designed to build both speed and accuracy.</p>
+                <div class="subject-chapters">
+                    <span class="chapter-pill">Atomic Structure</span>
+                    <span class="chapter-pill">Chemical Bonding</span>
+                    <span class="chapter-pill">Organic Reactions</span>
+                    <span class="chapter-pill">Equilibrium</span>
+                    <span class="chapter-pill">+27 more</span>
+                </div>
+            </div>
+            <div class="subject-card biology">
+                <div class="subject-emoji">🧬</div>
+                <h3>Biology</h3>
+                <p>Botany + Zoology — the highest weightage subject in NEET. Practice 90 questions across all life science chapters.</p>
+                <div class="subject-chapters">
+                    <span class="chapter-pill">Cell Biology</span>
+                    <span class="chapter-pill">Genetics</span>
+                    <span class="chapter-pill">Ecology</span>
+                    <span class="chapter-pill">Human Physiology</span>
+                    <span class="chapter-pill">+33 more</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── How It Works ───────────────────────────────────────────────── -->
+    <section class="how-section">
+        <div class="section-header">
+            <span class="eyebrow">Get Started in 3 Steps</span>
+            <h2>Simple. Structured. Effective.</h2>
+        </div>
+        <div class="steps-grid">
+            <div class="step">
+                <div class="step-num">1</div>
+                <h4>Create Free Account</h4>
+                <p>Sign up in under 60 seconds. No credit card needed.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <h4>Pick a Test</h4>
+                <p>Choose topic, chapter, subject, or full mock tests.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <h4>Attempt & Review</h4>
+                <p>Submit, see your score, review every answer in detail.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <h4>Track Progress</h4>
+                <p>Watch your scores improve. Identify and fix weak spots.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── CTA Section ───────────────────────────────────────────────── -->
+    <section class="cta-section">
+        <h2>Ready to Start Your NEET Journey?</h2>
+        <p>Join thousands of students already practicing smart with NEETPrep Pro.</p>
+        <a href="signup.html" class="btn-white">Create Free Account →</a>
+    </section>
+
+    <!-- ── Footer ────────────────────────────────────────────────────── -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="nav-logo">
+                    <div class="logo-icon">⚡</div>
+                    NEET<span style="color:#60a5fa;">Prep</span> Pro
+                </div>
+                <p>India's most comprehensive NEET practice platform, built to help every student succeed.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Practice</h4>
+                <ul>
+                    <li><a href="topic-tests.html">Topic Tests</a></li>
+                    <li><a href="chapter-tests.html">Chapter Tests</a></li>
+                    <li><a href="subject-tests.html">Subject Tests</a></li>
+                    <li><a href="mock-tests.html">Mock Tests</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Subjects</h4>
+                <ul>
+                    <li><a href="#">Physics</a></li>
+                    <li><a href="#">Chemistry</a></li>
+                    <li><a href="#">Biology</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="login.html">Log In</a></li>
+                    <li><a href="signup.html">Sign Up</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="history.html">History</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2025 NEETPrep Pro. All rights reserved.</span>
+            <div style="display:flex;gap:20px;">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ── Scripts ───────────────────────────────────────────────────── -->
+    <script type="module">
+        // ── Toast Notification System ───────────────────────────────────
+        /**
+         * Displays a dismissable toast notification.
+         * @param {string} message - Toast message
+         * @param {'success'|'error'|'info'} type - Toast type
+         */
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+        <span class="toast-icon">${icons[type] || icons.info}</span>
+        <span>${message}</span>
+        <button class="toast-close" aria-label="Dismiss">✕</button>
+      `;
+
+            // Close on button click
+            toast.querySelector('.toast-close').addEventListener('click', () => dismissToast(toast));
+            container.appendChild(toast);
+
+            // Auto-dismiss after 4s
+            setTimeout(() => dismissToast(toast), 4000);
+        }
+
+        function dismissToast(toast) {
+            toast.style.animation = 'toastOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }
+
+        // Expose globally for non-module scripts if needed
+        window.showToast = showToast;
+
+        // ── Mobile Menu Toggle ──────────────────────────────────────────
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        hamburger.addEventListener('click', () => {
+            mobileMenu.classList.toggle('open');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.remove('open');
+            }
+        });
+
+        // ── Animate progress bars on scroll ────────────────────────────
+        const bars = document.querySelectorAll('.progress-bar-fill');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Width is already set inline — trigger reflow to animate
+                    const bar = entry.target;
+                    const targetWidth = bar.style.width;
+                    bar.style.width = '0';
+                    requestAnimationFrame(() => {
+                        bar.style.width = targetWidth;
+                    });
+                    observer.unobserve(bar);
+                }
+            });
+        }, {
+            threshold: 0.2
+        });
+
+        bars.forEach(bar => observer.observe(bar));
+    </script>
+</body>
+
+</html>

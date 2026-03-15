@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Attempt History — NEETPrep Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --accent: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 280px;
+            max-width: 360px;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: .9rem;
+            font-weight: 500;
+            animation: toastIn .35s cubic-bezier(.34, 1.56, .64, 1) forwards;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--accent);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(0)
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+        }
+
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, .85);
+            backdrop-filter: blur(4px);
+            z-index: 8888;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 5%;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .nav-logo .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .nav-logo span {
+            color: var(--primary);
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-link {
+            padding: 8px 14px;
+            border-radius: 9px;
+            font-size: .9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: background .2s, color .2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(37, 99, 235, .08);
+            color: var(--primary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background .2s;
+        }
+
+        .avatar-btn:hover {
+            background: var(--bg);
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .9rem;
+        }
+
+        .avatar-name {
+            font-size: .88rem;
+            font-weight: 600;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dropdown-wrap {
+            position: relative;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            min-width: 190px;
+            padding: 8px;
+            z-index: 200;
+            display: none;
+        }
+
+        .dropdown.open {
+            display: block;
+            animation: fadeDown .2s ease;
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: .88rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg);
+        }
+
+        .dropdown-item.danger {
+            color: var(--danger);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 6px 0;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            background: none;
+            border: none;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 2px;
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            inset: 68px 0 0;
+            background: var(--surface);
+            z-index: 99;
+            padding: 20px 5%;
+            flex-direction: column;
+            gap: 4px;
+            border-top: 1px solid var(--border);
+        }
+
+        .mobile-nav.open {
+            display: flex;
+        }
+
+        .mobile-nav .nav-link {
+            padding: 12px 16px;
+            font-size: 1rem;
+        }
+
+        /* Page */
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 36px 5% 64px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .83rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .breadcrumb span {
+            color: var(--border);
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .page-header p {
+            font-size: .92rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        /* Aggregate Stats */
+        .agg-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .agg-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: transform .2s;
+        }
+
+        .agg-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .agg-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .agg-info strong {
+            display: block;
+            font-family: 'Sora', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        .agg-info span {
+            font-size: .78rem;
+            color: var(--text-muted);
+        }
+
+        /* Filter Row */
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 9px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .88rem;
+            background: var(--surface);
+            color: var(--text-primary);
+            outline: none;
+            cursor: pointer;
+            transition: border-color .2s;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .88rem;
+            background: var(--surface);
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .search-wrap input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            font-size: .9rem;
+        }
+
+        .results-info {
+            font-size: .84rem;
+            color: var(--text-muted);
+            margin-left: auto;
+            white-space: nowrap;
+        }
+
+        /* History Table */
+        .table-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 12px 18px;
+            text-align: left;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        thead th:hover {
+            color: var(--primary);
+        }
+
+        thead th .sort-icon {
+            margin-left: 4px;
+            opacity: .5;
+        }
+
+        thead th.sorted .sort-icon {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background .15s;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #f8fbff;
+        }
+
+        tbody td {
+            padding: 14px 18px;
+            font-size: .88rem;
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        .test-name-cell {
+            font-weight: 700;
+            max-width: 220px;
+        }
+
+        .test-name-cell .subname {
+            font-size: .78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: .74rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .type-topic {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .type-chapter {
+            background: #fdf4ff;
+            color: #9333ea;
+        }
+
+        .type-subject {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .type-mock {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+        .score-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score-num {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: .92rem;
+        }
+
+        .score-bar-mini {
+            width: 60px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 100px;
+        }
+
+        .score-high .score-bar-fill {
+            background: var(--accent);
+        }
+
+        .score-mid .score-bar-fill {
+            background: var(--warning);
+        }
+
+        .score-low .score-bar-fill {
+            background: var(--danger);
+        }
+
+        .score-high .score-num {
+            color: var(--accent);
+        }
+
+        .score-mid .score-num {
+            color: var(--warning);
+        }
+
+        .score-low .score-num {
+            color: var(--danger);
+        }
+
+        .date-cell {
+            color: var(--text-muted);
+            white-space: nowrap;
+            font-size: .85rem;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .btn-view {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: .8rem;
+            font-weight: 600;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            color: var(--primary);
+            cursor: pointer;
+            transition: background .15s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-view:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .btn-review-sm {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: .8rem;
+            font-weight: 600;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background .15s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-review-sm:hover {
+            background: var(--bg);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .page-info {
+            font-size: .87rem;
+            color: var(--text-muted);
+        }
+
+        .page-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .87rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .page-btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 72px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .empty-state svg {
+            opacity: .3;
+        }
+
+        .empty-state h4 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            font-size: .88rem;
+            color: var(--text-muted);
+            max-width: 280px;
+        }
+
+        .empty-state a {
+            margin-top: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 22px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: var(--radius);
+            font-size: .9rem;
+            font-weight: 600;
+            transition: background .2s;
+        }
+
+        .empty-state a:hover {
+            background: var(--primary-dark);
+        }
+
+        @media(max-width:900px) {
+            .agg-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-center {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+        }
+
+        @media(max-width:640px) {
+            .filter-row {
+                flex-direction: column;
+            }
+
+            .results-info {
+                margin-left: 0;
+            }
+
+            .table-card {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toast-container"></div>
+    <div id="loading-overlay" class="active">
+        <div class="spinner"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon">⚡</div>NEET<span>Prep</span> Pro
+        </a>
+        <div class="nav-center">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="topic-tests.html" class="nav-link">Topic Tests</a>
+            <a href="chapter-tests.html" class="nav-link">Chapter Tests</a>
+            <a href="mock-tests.html" class="nav-link">Mock Tests</a>
+            <a href="history.html" class="nav-link active">History</a>
+        </div>
+        <div class="nav-right">
+            <div class="dropdown-wrap">
+                <button class="avatar-btn" id="avatar-btn">
+                    <div class="avatar" id="user-avatar">?</div>
+                    <span class="avatar-name" id="user-name-nav">…</span>
+                    <span style="color:var(--text-muted);font-size:.8rem;">▾</span>
+                </button>
+                <div class="dropdown" id="nav-dropdown">
+                    <a href="dashboard.html" class="dropdown-item">📊 Dashboard</a>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item danger" id="btn-logout">🚪 Log Out</div>
+                </div>
+            </div>
+        </div>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </nav>
+    <div class="mobile-nav" id="mobile-nav">
+        <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+        <a href="topic-tests.html" class="nav-link">🎯 Topic Tests</a>
+        <a href="chapter-tests.html" class="nav-link">📖 Chapter Tests</a>
+        <a href="mock-tests.html" class="nav-link">📝 Mock Tests</a>
+        <a href="history.html" class="nav-link active">📋 History</a>
+        <div style="height:1px;background:var(--border);margin:8px 0;"></div>
+        <div class="nav-link" id="mobile-logout" style="color:var(--danger);cursor:pointer;">🚪 Log Out</div>
+    </div>
+
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <div class="breadcrumb">
+                    <a href="dashboard.html">Dashboard</a><span>/</span><span>History</span>
+                </div>
+                <h1>📋 Attempt History</h1>
+                <p>All your past test attempts, scores, and results in one place.</p>
+            </div>
+            <a href="topic-tests.html" style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:var(--primary);color:#fff;border-radius:var(--radius);font-size:.9rem;font-weight:600;text-decoration:none;transition:background .2s;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+                + New Test
+            </a>
+        </div>
+
+        <!-- Aggregate Stats -->
+        <div class="agg-stats" id="agg-stats">
+            <div class="agg-card">
+                <div class="agg-icon" style="background:#eff6ff;">📋</div>
+                <div class="agg-info"><strong id="agg-total">—</strong><span>Total Attempts</span></div>
+            </div>
+            <div class="agg-card">
+                <div class="agg-icon" style="background:#f0fdf4;">📊</div>
+                <div class="agg-info"><strong id="agg-avg">—</strong><span>Avg Score %</span></div>
+            </div>
+            <div class="agg-card">
+                <div class="agg-icon" style="background:#fff7ed;">🏆</div>
+                <div class="agg-info"><strong id="agg-best">—</strong><span>Best Score %</span></div>
+            </div>
+            <div class="agg-card">
+                <div class="agg-icon" style="background:#fdf4ff;">⏱</div>
+                <div class="agg-info"><strong id="agg-time">—</strong><span>Total Time Spent</span></div>
+            </div>
+        </div>
+
+        <!-- Filter Row -->
+        <div class="filter-row">
+            <select class="filter-select" id="filter-type">
+                <option value="all">All Types</option>
+                <option value="topic">Topic Tests</option>
+                <option value="chapter">Chapter Tests</option>
+                <option value="subject">Subject Tests</option>
+                <option value="mock">Mock Tests</option>
+            </select>
+            <select class="filter-select" id="filter-sort">
+                <option value="date-desc">Newest First</option>
+                <option value="date-asc">Oldest First</option>
+                <option value="score-desc">Highest Score</option>
+                <option value="score-asc">Lowest Score</option>
+            </select>
+            <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" placeholder="Search by test name…" />
+            </div>
+            <span class="results-info" id="results-info">Loading…</span>
+        </div>
+
+        <!-- Table -->
+        <div class="table-card" id="table-card">
+            <!-- Skeleton -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test Name</th>
+                        <th>Type</th>
+                        <th>Score</th>
+                        <th>Correct</th>
+                        <th>Wrong</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    ${[1,2,3,4,5].map(()=>`
+                    <tr>
+                        <td>
+                            <div class="skeleton" style="width:160px;height:16px;"></div>
+                        </td>
+                        <td>
+                            <div class="skeleton" style="width:70px;height:20px;border-radius:100px;"></div>
+                        </td>
+                        <td>
+                            <div class="skeleton" style="width:80px;height:16px;"></div>
+                        </td>
+                        <td>
+                            <div class="skeleton" style="width:30px;height:16px;"></div>
+                        </td>
+                        <td>
+                            <div class="skeleton" style="width:30px;height:16px;"></div>
+                        </td>
+                        <td>
+                            <div class="skeleton" style="width:90px;height:16px;"></div>
+                        </td>
+                        <td>
+                            <div class="skeleton" style="width:120px;height:30px;border-radius:8px;"></div>
+                        </td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+            <span class="page-info" id="page-info">Page 1 of 1</span>
+            <div class="page-btns" id="page-btns"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import {
+            getDatabase,
+            ref,
+            get,
+            query,
+            orderByChild,
+            equalTo
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyA1GdFV2LYAUktkNswT4axg1fr6UrYEF48",
+  authDomain: "neetpreppro-445b2.firebaseapp.com",
+  databaseURL: "https://neetpreppro-445b2-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "neetpreppro-445b2",
+  storageBucket: "neetpreppro-445b2.firebasestorage.app",
+  messagingSenderId: "589750441567",
+  appId: "1:589750441567:web:7396b9de030374cabe2dea",
+  measurementId: "G-7SYLBDLY71"
+};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        function showToast(msg, type = 'info') {
+            const c = document.getElementById('toast-container');
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${msg}</span><button class="toast-close">✕</button>`;
+            t.querySelector('.toast-close').addEventListener('click', () => dismiss(t));
+            c.appendChild(t);
+            setTimeout(() => dismiss(t), 4000);
+        }
+
+        function dismiss(t) {
+            t.style.animation = 'toastOut .3s ease forwards';
+            setTimeout(() => t.remove(), 300);
+        }
+
+        // ── State ──
+        const PAGE_SIZE = 10;
+        let allAttempts = []; // all attempts for this user, enriched
+        let filtered = []; // after filter + search + sort
+        let currentPage = 1;
+
+        // Filter state
+        let filterType = 'all';
+        let filterSort = 'date-desc';
+        let searchVal = '';
+
+        onAuthStateChanged(auth, async user => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const n = user.displayName || 'Student';
+            document.getElementById('user-name-nav').textContent = n.split(' ')[0];
+            document.getElementById('user-avatar').textContent = n[0].toUpperCase();
+            await loadHistory(user.uid);
+        });
+
+        // ── Load all user attempts ──────────────────────────────────────
+        async function loadHistory(uid) {
+            try {
+                const snap = await get(query(ref(db, 'attempts'), orderByChild('userId'), equalTo(uid)));
+                allAttempts = [];
+                if (snap.exists()) {
+                    snap.forEach(child => {
+                        const v = child.val();
+                        if (v.userId === uid) allAttempts.push({
+                            id: child.key,
+                            ...v
+                        });
+                    });
+                }
+
+                // Sort descending by default
+                allAttempts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                // Compute aggregate stats
+                renderAggStats();
+
+                document.getElementById('loading-overlay').classList.remove('active');
+                applyFiltersAndRender();
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loading-overlay').classList.remove('active');
+                showToast('Failed to load history. Check your connection.', 'error');
+                renderEmptyState('Failed to load history.');
+            }
+        }
+
+        // ── Aggregate stats ─────────────────────────────────────────────
+        function renderAggStats() {
+            const total = allAttempts.length;
+            document.getElementById('agg-total').textContent = total;
+
+            if (!total) {
+                ['agg-avg', 'agg-best', 'agg-time'].forEach(id => document.getElementById(id).textContent = '—');
+                return;
+            }
+
+            // Compute pct for each attempt
+            const pcts = allAttempts.map(a => {
+                const max = ((a.correct || 0) + (a.wrong || 0) + (a.unattempted || 0)) * 4;
+                return max > 0 ? (a.score || 0) / max * 100 : 0;
+            });
+            const avg = Math.round(pcts.reduce((s, v) => s + v, 0) / pcts.length);
+            const best = Math.round(Math.max(...pcts));
+
+            // Total time in hours / minutes
+            const totalSecs = allAttempts.reduce((s, a) => s + (a.timeTaken || 0), 0);
+            const hrs = Math.floor(totalSecs / 3600);
+            const mins = Math.floor((totalSecs % 3600) / 60);
+            const timeLabel = hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+
+            document.getElementById('agg-avg').textContent = `${avg}%`;
+            document.getElementById('agg-best').textContent = `${best}%`;
+            document.getElementById('agg-time').textContent = timeLabel;
+        }
+
+        // ── Apply filters, sort, search ─────────────────────────────────
+        function applyFiltersAndRender() {
+            // Filter by type
+            filtered = filterType === 'all' ?
+                [...allAttempts] :
+                allAttempts.filter(a => a.testType === filterType);
+
+            // Search by title
+            if (searchVal) {
+                filtered = filtered.filter(a => (a.testTitle || '').toLowerCase().includes(searchVal));
+            }
+
+            // Sort
+            filtered.sort((a, b) => {
+                switch (filterSort) {
+                    case 'date-asc':
+                        return (a.createdAt || 0) - (b.createdAt || 0);
+                    case 'score-desc':
+                        return (b.score || 0) - (a.score || 0);
+                    case 'score-asc':
+                        return (a.score || 0) - (b.score || 0);
+                    default:
+                        return (b.createdAt || 0) - (a.createdAt || 0);
+                }
+            });
+
+            currentPage = 1;
+            render();
+        }
+
+        // ── Render current page ─────────────────────────────────────────
+        function render() {
+            const total = filtered.length;
+            const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+            currentPage = Math.min(currentPage, pages);
+
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const slice = filtered.slice(start, start + PAGE_SIZE);
+
+            document.getElementById('results-info').textContent =
+                `${total} attempt${total!==1?'s':''} found`;
+
+            renderTable(slice);
+            renderPagination(pages);
+        }
+
+        // ── Render table rows ───────────────────────────────────────────
+        function renderTable(rows) {
+            const tbody = document.getElementById('table-body');
+
+            if (!rows.length) {
+                renderEmptyState(allAttempts.length ? 'No attempts match your filters.' : "You haven't attempted any tests yet.");
+                return;
+            }
+
+            // Restore table structure if it was replaced by empty state
+            const tableCard = document.getElementById('table-card');
+            if (!tableCard.querySelector('table')) {
+                tableCard.innerHTML = `<table><thead><tr>
+          <th>Test Name</th><th>Type</th><th>Score</th><th>Correct</th><th>Wrong</th><th>Date</th><th>Actions</th>
+        </tr></thead><tbody id="table-body"></tbody></table>`;
+            }
+
+            const typeBadge = t => {
+                const map = {
+                    topic: 'type-topic',
+                    chapter: 'type-chapter',
+                    subject: 'type-subject',
+                    mock: 'type-mock'
+                };
+                const labels = {
+                    topic: 'Topic',
+                    chapter: 'Chapter',
+                    subject: 'Subject',
+                    mock: 'Mock'
+                };
+                return `<span class="type-badge ${map[t]||'type-topic'}">${labels[t]||t}</span>`;
+            };
+
+            const fmtDate = ts => new Date(ts).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+            const fmtTime = s => {
+                const m = Math.floor(s / 60);
+                const sec = s % 60;
+                return `${m}m ${sec}s`;
+            };
+
+            document.getElementById('table-body').innerHTML = rows.map(a => {
+                const totalQ = (a.correct || 0) + (a.wrong || 0) + (a.unattempted || 0);
+                const maxScore = totalQ * 4;
+                const pct = maxScore > 0 ? Math.round(((a.score || 0) / maxScore) * 100) : 0;
+                const scoreCls = pct >= 70 ? 'score-high' : pct >= 40 ? 'score-mid' : 'score-low';
+                return `
+          <tr>
+            <td>
+              <div class="test-name-cell">
+                ${a.testTitle||'Test'}
+                ${a.testSubject?`<div class="subname">${a.testSubject}</div>`:''}
+              </div>
+            </td>
+            <td>${typeBadge(a.testType)}</td>
+            <td>
+              <div class="score-cell ${scoreCls}">
+                <span class="score-num">${a.score||0}/${maxScore}</span>
+                <div class="score-bar-mini">
+                  <div class="score-bar-fill" style="width:${pct}%;"></div>
+                </div>
+              </div>
+            </td>
+            <td style="color:var(--accent);font-weight:700;">${a.correct||0}</td>
+            <td style="color:var(--danger);font-weight:700;">${a.wrong||0}</td>
+            <td class="date-cell">
+              ${fmtDate(a.createdAt)}
+              <div style="font-size:.75rem;margin-top:2px;">${fmtTime(a.timeTaken||0)}</div>
+            </td>
+            <td>
+              <div class="action-btns">
+                <a href="result.html?attemptId=${a.id}" class="btn-view">📊 Result</a>
+                <a href="review.html?attemptId=${a.id}" class="btn-review-sm">🔍 Review</a>
+              </div>
+            </td>
+          </tr>
+        `;
+            }).join('');
+        }
+
+        // ── Pagination ──────────────────────────────────────────────────
+        function renderPagination(totalPages) {
+            document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+            const container = document.getElementById('page-btns');
+            container.innerHTML = '';
+
+            // Prev
+            const prev = document.createElement('button');
+            prev.className = 'page-btn';
+            prev.textContent = '←';
+            prev.disabled = currentPage === 1;
+            prev.addEventListener('click', () => {
+                currentPage--;
+                render();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            container.appendChild(prev);
+
+            // Page numbers (show up to 5 around current)
+            const startP = Math.max(1, currentPage - 2);
+            const endP = Math.min(totalPages, currentPage + 2);
+            for (let p = startP; p <= endP; p++) {
+                const btn = document.createElement('button');
+                btn.className = `page-btn${p===currentPage?' active':''}`;
+                btn.textContent = p;
+                btn.addEventListener('click', () => {
+                    currentPage = p;
+                    render();
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+                container.appendChild(btn);
+            }
+
+            // Next
+            const next = document.createElement('button');
+            next.className = 'page-btn';
+            next.textContent = '→';
+            next.disabled = currentPage === totalPages;
+            next.addEventListener('click', () => {
+                currentPage++;
+                render();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            container.appendChild(next);
+        }
+
+        // ── Empty state ─────────────────────────────────────────────────
+        function renderEmptyState(msg) {
+            document.getElementById('table-card').innerHTML = `
+        <div class="empty-state">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <h4>No Attempts Found</h4>
+          <p>${msg}</p>
+          ${!allAttempts.length?'<a href="topic-tests.html">Start Your First Test →</a>':''}
+        </div>
+      `;
+            document.getElementById('page-btns').innerHTML = '';
+            document.getElementById('page-info').textContent = '';
+        }
+
+        // ── Filter / search event listeners ────────────────────────────
+        document.getElementById('filter-type').addEventListener('change', e => {
+            filterType = e.target.value;
+            applyFiltersAndRender();
+        });
+        document.getElementById('filter-sort').addEventListener('change', e => {
+            filterSort = e.target.value;
+            applyFiltersAndRender();
+        });
+        document.getElementById('search-input').addEventListener('input', e => {
+            searchVal = e.target.value.trim().toLowerCase();
+            applyFiltersAndRender();
+        });
+
+        // ── Navbar ──────────────────────────────────────────────────────
+        const avatarBtn = document.getElementById('avatar-btn');
+        const dropdown = document.getElementById('nav-dropdown');
+        avatarBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            dropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', () => dropdown.classList.remove('open'));
+
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (e) {
+                console.error(e);
+                showToast('Logout failed.', 'error');
+            }
+        }
+        document.getElementById('btn-logout').addEventListener('click', handleLogout);
+        document.getElementById('mobile-logout').addEventListener('click', handleLogout);
+
+        const hb = document.getElementById('hamburger');
+        const mn = document.getElementById('mobile-nav');
+        hb.addEventListener('click', () => mn.classList.toggle('open'));
+        document.addEventListener('click', e => {
+            if (!hb.contains(e.target) && !mn.contains(e.target)) mn.classList.remove('open');
+        });
+    </script>
+</body>
+
+</html>

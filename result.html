@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Result — NEETPrep Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --accent: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 280px;
+            max-width: 360px;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .14);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: .9rem;
+            font-weight: 500;
+            animation: toastIn .35s cubic-bezier(.34, 1.56, .64, 1) forwards;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--accent);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+        }
+
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, .8);
+            backdrop-filter: blur(4px);
+            z-index: 8888;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 5%;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .nav-logo .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .nav-logo span {
+            color: var(--primary);
+        }
+
+        .btn-nav-back {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-size: .88rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: background .2s;
+        }
+
+        .btn-nav-back:hover {
+            background: var(--border);
+        }
+
+        /* Page */
+        .page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 36px 5% 64px;
+        }
+
+        /* Score Hero */
+        .score-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-hero::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            left: -80px;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, .15);
+        }
+
+        .score-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            right: -60px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(34, 197, 94, .08);
+        }
+
+        .hero-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-tag {
+            font-size: .82rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, .5);
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .hero-score {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .hero-max {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, .45);
+            margin-bottom: 20px;
+        }
+
+        .pct-badge {
+            display: inline-block;
+            padding: 8px 22px;
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 22px;
+        }
+
+        .pct-excellent {
+            background: rgba(34, 197, 94, .2);
+            color: #4ade80;
+            border: 1.5px solid rgba(34, 197, 94, .3);
+        }
+
+        .pct-good {
+            background: rgba(37, 99, 235, .2);
+            color: #93c5fd;
+            border: 1.5px solid rgba(37, 99, 235, .3);
+        }
+
+        .pct-average {
+            background: rgba(245, 158, 11, .2);
+            color: #fcd34d;
+            border: 1.5px solid rgba(245, 158, 11, .3);
+        }
+
+        .pct-poor {
+            background: rgba(239, 68, 68, .2);
+            color: #fca5a5;
+            border: 1.5px solid rgba(239, 68, 68, .3);
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta-item {
+            font-size: .83rem;
+            color: rgba(255, 255, 255, .5);
+        }
+
+        .hero-meta-item strong {
+            color: rgba(255, 255, 255, .88);
+            font-weight: 700;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .s-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 14px;
+            text-align: center;
+            transition: transform .2s;
+        }
+
+        .s-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .s-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .s-val {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 3px;
+        }
+
+        .s-lbl {
+            font-size: .76rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .s-card.c .s-val {
+            color: var(--accent);
+        }
+
+        .s-card.w .s-val {
+            color: var(--danger);
+        }
+
+        .s-card.u .s-val {
+            color: var(--text-muted);
+        }
+
+        .s-card.t .s-val {
+            color: var(--primary);
+        }
+
+        /* Cards */
+        .panel {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .panel-hdr {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-hdr h3 {
+            font-size: .98rem;
+            font-weight: 700;
+        }
+
+        .panel-body {
+            padding: 22px;
+        }
+
+        /* Canvas chart */
+        #subjectChart {
+            display: block;
+            max-height: 220px;
+            width: 100%;
+        }
+
+        /* Breakdown table */
+        .bk-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bk-table th {
+            padding: 10px 18px;
+            text-align: left;
+            font-size: .74rem;
+            font-weight: 700;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .bk-table td {
+            padding: 14px 18px;
+            font-size: .88rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .bk-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .prog-bg {
+            height: 6px;
+            background: var(--border);
+            border-radius: 100px;
+            overflow: hidden;
+            min-width: 50px;
+        }
+
+        .prog-fill {
+            height: 100%;
+            border-radius: 100px;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 26px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .93rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        @media(max-width:600px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-row {
+                flex-direction: column;
+            }
+
+            .action-row a {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toast-container"></div>
+    <div id="loading-overlay" class="active">
+        <div class="spinner"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon">⚡</div>NEET<span>Prep</span> Pro
+        </a>
+        <a href="dashboard.html" class="btn-nav-back">← Dashboard</a>
+    </nav>
+
+    <div class="page" id="result-page" style="display:none;">
+        <div class="score-hero">
+            <div class="hero-inner">
+                <div class="hero-tag" id="hero-tag">Result</div>
+                <div class="hero-score" id="hero-score">—</div>
+                <div class="hero-max" id="hero-max">out of —</div>
+                <div class="pct-badge" id="pct-badge">—</div>
+                <div class="hero-meta">
+                    <span class="hero-meta-item">📅 <strong id="hero-date">—</strong></span>
+                    <span class="hero-meta-item">⏱ <strong id="hero-time">—</strong></span>
+                    <span class="hero-meta-item">📋 Type: <strong id="hero-type">—</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="s-card c">
+                <div class="s-icon">✅</div>
+                <div class="s-val" id="sc-correct">0</div>
+                <div class="s-lbl">Correct (+4)</div>
+            </div>
+            <div class="s-card w">
+                <div class="s-icon">❌</div>
+                <div class="s-val" id="sc-wrong">0</div>
+                <div class="s-lbl">Wrong (−1)</div>
+            </div>
+            <div class="s-card u">
+                <div class="s-icon">○</div>
+                <div class="s-val" id="sc-una">0</div>
+                <div class="s-lbl">Unattempted</div>
+            </div>
+            <div class="s-card t">
+                <div class="s-icon">⏱</div>
+                <div class="s-val" id="sc-time">—</div>
+                <div class="s-lbl">Time Taken</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-hdr">
+                <h3>📊 Subject-wise Performance</h3>
+            </div>
+            <div class="panel-body"><canvas id="subjectChart"></canvas></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-hdr">
+                <h3>📋 Detailed Breakdown</h3>
+            </div>
+            <table class="bk-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>✅ Correct</th>
+                        <th>❌ Wrong</th>
+                        <th>○ Skip</th>
+                        <th>Score</th>
+                        <th>Accuracy</th>
+                    </tr>
+                </thead>
+                <tbody id="bk-tbody"></tbody>
+            </table>
+        </div>
+
+        <div class="action-row">
+            <a id="btn-review" href="#" class="btn-primary">🔍 Review Answers</a>
+            <a href="dashboard.html" class="btn-ghost">📊 Dashboard</a>
+            <a href="history.html" class="btn-ghost">📋 All Attempts</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import {
+            getDatabase,
+            ref,
+            get
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyA1GdFV2LYAUktkNswT4axg1fr6UrYEF48",
+  authDomain: "neetpreppro-445b2.firebaseapp.com",
+  databaseURL: "https://neetpreppro-445b2-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "neetpreppro-445b2",
+  storageBucket: "neetpreppro-445b2.firebasestorage.app",
+  messagingSenderId: "589750441567",
+  appId: "1:589750441567:web:7396b9de030374cabe2dea",
+  measurementId: "G-7SYLBDLY71"
+};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        function showToast(msg, type = 'info') {
+            const c = document.getElementById('toast-container'),
+                icon = {
+                    success: '✅',
+                    error: '❌',
+                    info: 'ℹ️'
+                } [type] || 'ℹ️';
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<span>${icon}</span><span>${msg}</span><button class="toast-close">✕</button>`;
+            t.querySelector('.toast-close').addEventListener('click', () => dismiss(t));
+            c.appendChild(t);
+            setTimeout(() => dismiss(t), 4000);
+        }
+
+        function dismiss(t) {
+            t.style.animation = 'toastOut .3s ease forwards';
+            setTimeout(() => t.remove(), 300);
+        }
+
+        function fmtTime(s) {
+            const h = Math.floor(s / 3600),
+                m = Math.floor((s % 3600) / 60),
+                sc = s % 60;
+            return h > 0 ? `${h}h ${m}m ${sc}s` : `${m}m ${sc}s`;
+        }
+
+        function fmtDate(ts) {
+            return new Date(ts).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        onAuthStateChanged(auth, async user => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            await initPage(user);
+        });
+
+        async function initPage(user) {
+            const params = new URLSearchParams(window.location.search);
+            const aId = params.get('attemptId');
+            if (!aId) {
+                showToast('No attempt ID.', 'error');
+                setTimeout(() => window.location.href = 'dashboard.html', 2000);
+                return;
+            }
+            try {
+                const aSnap = await get(ref(db, `attempts/${aId}`));
+                if (!aSnap.exists()) {
+                    showToast('Attempt not found.', 'error');
+                    setTimeout(() => window.location.href = 'dashboard.html', 2000);
+                    return;
+                }
+                const attempt = aSnap.val();
+                if (attempt.userId !== user.uid) {
+                    showToast('Access denied.', 'error');
+                    setTimeout(() => window.location.href = 'dashboard.html', 2000);
+                    return;
+                }
+
+                // Load test + questions for breakdown
+                const tSnap = await get(ref(db, `tests/${attempt.testId}`));
+                const tData = tSnap.exists() ? tSnap.val() : {};
+                let questions = [];
+                if ((tData.questionIds || []).length) {
+                    const snaps = await Promise.all(tData.questionIds.map(id => get(ref(db, `questions/${id}`))));
+                    questions = snaps.map((s, i) => s.exists() ? {
+                        id: tData.questionIds[i],
+                        ...s.val()
+                    } : null).filter(Boolean);
+                }
+                document.getElementById('loading-overlay').classList.remove('active');
+                document.getElementById('result-page').style.display = 'block';
+                render(attempt, aId, questions);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loading-overlay').classList.remove('active');
+                showToast('Could not load result. Check your connection.', 'error');
+            }
+        }
+
+        function render(attempt, aId, questions) {
+            const totalQ = (attempt.correct || 0) + (attempt.wrong || 0) + (attempt.unattempted || 0);
+            const maxScore = totalQ * 4;
+            const pct = maxScore > 0 ? Math.round(((attempt.score || 0) / maxScore) * 100) : 0;
+
+            document.getElementById('hero-tag').textContent = attempt.testTitle || 'Exam';
+            document.getElementById('hero-score').textContent = attempt.score || 0;
+            document.getElementById('hero-max').textContent = `out of ${maxScore}`;
+            document.getElementById('hero-date').textContent = fmtDate(attempt.createdAt);
+            document.getElementById('hero-time').textContent = fmtTime(attempt.timeTaken || 0);
+            document.getElementById('hero-type').textContent = (attempt.testType || 'test')[0].toUpperCase() + (attempt.testType || 'test').slice(1);
+
+            const badge = document.getElementById('pct-badge');
+            if (pct >= 80) {
+                badge.textContent = `🏆 ${pct}% — Excellent!`;
+                badge.className = 'pct-badge pct-excellent';
+            } else if (pct >= 60) {
+                badge.textContent = `👍 ${pct}% — Good`;
+                badge.className = 'pct-badge pct-good';
+            } else if (pct >= 40) {
+                badge.textContent = `📈 ${pct}% — Average`;
+                badge.className = 'pct-badge pct-average';
+            } else {
+                badge.textContent = `💪 ${pct}% — Keep Practising`;
+                badge.className = 'pct-badge pct-poor';
+            }
+
+            document.getElementById('sc-correct').textContent = attempt.correct || 0;
+            document.getElementById('sc-wrong').textContent = attempt.wrong || 0;
+            document.getElementById('sc-una').textContent = attempt.unattempted || 0;
+            document.getElementById('sc-time').textContent = fmtTime(attempt.timeTaken || 0);
+            document.getElementById('btn-review').href = `review.html?attemptId=${aId}`;
+
+            if (questions.length) {
+                const stats = getSubjectStats(attempt, questions);
+                renderTable(stats);
+                renderChart(stats);
+            }
+        }
+
+        /** Build per-subject stats from answers + question list */
+        function getSubjectStats(attempt, questions) {
+            const subjects = {};
+            questions.forEach(q => {
+                const s = q.subject || 'General';
+                if (!subjects[s]) subjects[s] = {
+                    correct: 0,
+                    wrong: 0,
+                    unattempted: 0
+                };
+                const ua = attempt.answers?.[q.id];
+                if (!ua) subjects[s].unattempted++;
+                else if (ua === q.correctAnswer) subjects[s].correct++;
+                else subjects[s].wrong++;
+            });
+            return subjects;
+        }
+
+        function renderTable(stats) {
+            const colors = {
+                Physics: '#2563eb',
+                Chemistry: '#9333ea',
+                Biology: '#16a34a',
+                General: '#64748b'
+            };
+            document.getElementById('bk-tbody').innerHTML = Object.entries(stats).map(([subj, s]) => {
+                const total = s.correct + s.wrong + s.unattempted;
+                const score = s.correct * 4 - s.wrong;
+                const maxS = total * 4;
+                const acc = total > 0 ? Math.round((s.correct / total) * 100) : 0;
+                const col = colors[subj] || '#64748b';
+                return `<tr>
+          <td><strong>${subj}</strong></td>
+          <td style="color:var(--accent);font-weight:700;">${s.correct}</td>
+          <td style="color:var(--danger);font-weight:700;">${s.wrong}</td>
+          <td style="color:var(--text-muted);">${s.unattempted}</td>
+          <td><strong>${score} / ${maxS}</strong></td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><span style="font-weight:700;font-size:.88rem;min-width:36px;">${acc}%</span><div class="prog-bg" style="flex:1;"><div class="prog-fill" style="width:${acc}%;background:${col};"></div></div></div></td>
+        </tr>`;
+            }).join('');
+        }
+
+        /** Canvas grouped bar chart — no external library */
+        function renderChart(stats) {
+            const canvas = document.getElementById('subjectChart');
+            const ctx = canvas.getContext('2d');
+            const subjects = Object.keys(stats);
+            if (!subjects.length) return;
+
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth - 44;
+            canvas.height = 200;
+
+            const W = canvas.width,
+                H = canvas.height;
+            const pL = 44,
+                pB = 52,
+                pT = 20,
+                pR = 16;
+            const cW = W - pL - pR,
+                cH = H - pB - pT;
+            const maxVal = Math.max(...subjects.map(s => Math.max(stats[s].correct, stats[s].wrong, stats[s].unattempted)), 1);
+            const groupW = cW / subjects.length;
+            const barW = Math.min(groupW / 4.5, 24);
+            const barGap = 3;
+
+            ctx.clearRect(0, 0, W, H);
+
+            // Grid lines
+            for (let i = 0; i <= 5; i++) {
+                const val = Math.round((maxVal / 5) * i);
+                const y = pT + cH - (i / 5) * cH;
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(pL, y);
+                ctx.lineTo(W - pR, y);
+                ctx.stroke();
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '11px DM Sans,sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(val, pL - 5, y + 4);
+            }
+
+            const palette = {
+                correct: '#22c55e',
+                wrong: '#ef4444',
+                unattempted: '#94a3b8'
+            };
+            const keys = ['correct', 'wrong', 'unattempted'];
+
+            subjects.forEach((subj, gi) => {
+                const cx = pL + gi * groupW + groupW / 2 - ((barW + barGap) * 3) / 2;
+                keys.forEach((key, ki) => {
+                    const val = stats[subj][key] || 0;
+                    const bH = (val / maxVal) * cH;
+                    const x = cx + ki * (barW + barGap);
+                    const y = pT + cH - bH;
+                    ctx.fillStyle = palette[key];
+                    ctx.beginPath();
+                    if (ctx.roundRect) ctx.roundRect(x, y, barW, Math.max(bH, 1), [3, 3, 0, 0]);
+                    else ctx.rect(x, y, barW, Math.max(bH, 1));
+                    ctx.fill();
+                    if (val > 0) {
+                        ctx.fillStyle = '#374151';
+                        ctx.font = 'bold 10px DM Sans,sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(val, x + barW / 2, y - 4);
+                    }
+                });
+                ctx.fillStyle = '#64748b';
+                ctx.font = '12px DM Sans,sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(subj, pL + gi * groupW + groupW / 2, H - 6);
+            });
+
+            // Legend
+            const legY = H - 40;
+            const legX = pL;
+            ['Correct', 'Wrong', 'Unattempted'].forEach((lbl, i) => {
+                const lx = legX + i * 110;
+                ctx.fillStyle = Object.values(palette)[i];
+                ctx.fillRect(lx, legY, 11, 11);
+                ctx.fillStyle = '#64748b';
+                ctx.font = '10px DM Sans,sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(lbl, lx + 15, legY + 9);
+            });
+        }
+    </script>
+</body>
+
+</html>

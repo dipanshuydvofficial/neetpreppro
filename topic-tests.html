@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Topic Tests — NEETPrep Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --accent: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Toast */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 280px;
+            max-width: 360px;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: .9rem;
+            font-weight: 500;
+            animation: toastIn .35s cubic-bezier(.34, 1.56, .64, 1) forwards;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--accent);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(0)
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(60px)
+            }
+        }
+
+        /* Loading */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, .8);
+            backdrop-filter: blur(4px);
+            z-index: 8888;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 5%;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .nav-logo .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .nav-logo span {
+            color: var(--primary);
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-link {
+            padding: 8px 14px;
+            border-radius: 9px;
+            font-size: .9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: background .2s, color .2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(37, 99, 235, .08);
+            color: var(--primary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background .2s;
+        }
+
+        .avatar-btn:hover {
+            background: var(--bg);
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .9rem;
+            flex-shrink: 0;
+        }
+
+        .avatar-name {
+            font-size: .88rem;
+            font-weight: 600;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dropdown-wrap {
+            position: relative;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            min-width: 190px;
+            padding: 8px;
+            z-index: 200;
+            display: none;
+        }
+
+        .dropdown.open {
+            display: block;
+            animation: fadeDown .2s ease;
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: .88rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg);
+        }
+
+        .dropdown-item.danger {
+            color: var(--danger);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 6px 0;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            background: none;
+            border: none;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 2px;
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            inset: 68px 0 0;
+            background: var(--surface);
+            z-index: 99;
+            padding: 20px 5%;
+            flex-direction: column;
+            gap: 4px;
+            border-top: 1px solid var(--border);
+        }
+
+        .mobile-nav.open {
+            display: flex;
+        }
+
+        .mobile-nav .nav-link {
+            padding: 12px 16px;
+            font-size: 1rem;
+        }
+
+        /* Page */
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px 5% 60px;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .83rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .breadcrumb span {
+            color: var(--border);
+        }
+
+        .page-header h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+        }
+
+        .page-header p {
+            font-size: .95rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            max-width: 520px;
+        }
+
+        /* Subject Tabs */
+        .subject-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: 2px solid var(--border);
+            border-radius: 100px;
+            background: var(--surface);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .tab-btn .tab-count {
+            font-size: .72rem;
+            padding: 2px 7px;
+            border-radius: 100px;
+            background: rgba(255, 255, 255, .25);
+            font-weight: 700;
+        }
+
+        .tab-btn:not(.active) .tab-count {
+            background: var(--bg);
+            color: var(--text-muted);
+        }
+
+        /* Search & Filter Row */
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 11px 16px 11px 42px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .9rem;
+            background: var(--surface);
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .search-wrap input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .results-count {
+            font-size: .85rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* Chapter Group */
+        .chapter-group {
+            margin-bottom: 36px;
+        }
+
+        .chapter-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .chapter-heading h2 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .chapter-tag {
+            font-size: .75rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 100px;
+            background: var(--bg);
+            color: var(--text-muted);
+        }
+
+        .tests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        /* Test Card */
+        .test-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: transform .2s, box-shadow .2s, border-color .2s;
+            cursor: pointer;
+        }
+
+        .test-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 36px rgba(37, 99, 235, .1);
+            border-color: rgba(37, 99, 235, .25);
+        }
+
+        .test-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .topic-badge {
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 100px;
+            letter-spacing: .04em;
+        }
+
+        .badge-physics {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .badge-chemistry {
+            background: #fdf4ff;
+            color: #9333ea;
+        }
+
+        .badge-biology {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .test-card-title {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .test-card-meta {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: .8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .test-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        .difficulty-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .diff-easy {
+            background: #22c55e;
+        }
+
+        .diff-medium {
+            background: #f59e0b;
+        }
+
+        .diff-hard {
+            background: #ef4444;
+        }
+
+        .diff-label {
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .btn-start {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+            text-decoration: none;
+        }
+
+        .btn-start:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Skeleton Cards */
+        .skeleton-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 72px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .empty-state svg {
+            opacity: .3;
+        }
+
+        .empty-state h4 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            font-size: .88rem;
+            color: var(--text-muted);
+            max-width: 280px;
+        }
+
+        @media(max-width:768px) {
+            .nav-center {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+        }
+
+        @media(max-width:520px) {
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toast-container"></div>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon">⚡</div>NEET<span>Prep</span> Pro
+        </a>
+        <div class="nav-center">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="topic-tests.html" class="nav-link active">Topic Tests</a>
+            <a href="chapter-tests.html" class="nav-link">Chapter Tests</a>
+            <a href="mock-tests.html" class="nav-link">Mock Tests</a>
+            <a href="history.html" class="nav-link">History</a>
+        </div>
+        <div class="nav-right">
+            <div class="dropdown-wrap">
+                <button class="avatar-btn" id="avatar-btn">
+                    <div class="avatar" id="user-avatar">?</div>
+                    <span class="avatar-name" id="user-name-nav">…</span>
+                    <span style="color:var(--text-muted);font-size:.8rem;">▾</span>
+                </button>
+                <div class="dropdown" id="nav-dropdown">
+                    <a href="dashboard.html" class="dropdown-item">📊 Dashboard</a>
+                    <a href="history.html" class="dropdown-item">📋 History</a>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item danger" id="btn-logout">🚪 Log Out</div>
+                </div>
+            </div>
+        </div>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </nav>
+    <div class="mobile-nav" id="mobile-nav">
+        <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+        <a href="topic-tests.html" class="nav-link active">🎯 Topic Tests</a>
+        <a href="chapter-tests.html" class="nav-link">📖 Chapter Tests</a>
+        <a href="subject-tests.html" class="nav-link">🏫 Subject Tests</a>
+        <a href="mock-tests.html" class="nav-link">📝 Mock Tests</a>
+        <a href="history.html" class="nav-link">📋 History</a>
+        <div style="height:1px;background:var(--border);margin:8px 0;"></div>
+        <div class="nav-link" id="mobile-logout" style="color:var(--danger);cursor:pointer;">🚪 Log Out</div>
+    </div>
+
+    <!-- Page -->
+    <div class="page">
+        <div class="page-header">
+            <div class="breadcrumb">
+                <a href="dashboard.html">Dashboard</a>
+                <span>/</span>
+                <span>Topic Tests</span>
+            </div>
+            <h1>🎯 Topic Tests</h1>
+            <p>Practice individual topics to master each concept. Select a subject, then start any test.</p>
+        </div>
+
+        <!-- Subject Tabs -->
+        <div class="subject-tabs">
+            <button class="tab-btn active" data-subject="all">
+                All Subjects <span class="tab-count" id="cnt-all">0</span>
+            </button>
+            <button class="tab-btn" data-subject="Physics">
+                ⚡ Physics <span class="tab-count" id="cnt-physics">0</span>
+            </button>
+            <button class="tab-btn" data-subject="Chemistry">
+                🧪 Chemistry <span class="tab-count" id="cnt-chemistry">0</span>
+            </button>
+            <button class="tab-btn" data-subject="Biology">
+                🧬 Biology <span class="tab-count" id="cnt-biology">0</span>
+            </button>
+        </div>
+
+        <!-- Filter Row -->
+        <div class="filter-row">
+            <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" placeholder="Search topics or chapters…" />
+            </div>
+            <span class="results-count" id="results-count">Loading tests…</span>
+        </div>
+
+        <!-- Tests Container -->
+        <div id="tests-container">
+            <!-- Skeleton loader -->
+            <div class="chapter-group">
+                <div class="chapter-heading">
+                    <div class="skeleton" style="width:160px;height:20px;"></div>
+                </div>
+                <div class="tests-grid">
+                    ${[1,2,3].map(()=>`
+                    <div class="skeleton-card">
+                        <div class="skeleton" style="width:80px;height:20px;"></div>
+                        <div class="skeleton" style="width:100%;height:18px;"></div>
+                        <div class="skeleton" style="width:60%;height:14px;"></div>
+                        <div class="skeleton" style="width:100%;height:36px;"></div>
+                    </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import {
+            getDatabase,
+            ref,
+            get,
+            query,
+            orderByChild,
+            equalTo
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyA1GdFV2LYAUktkNswT4axg1fr6UrYEF48",
+  authDomain: "neetpreppro-445b2.firebaseapp.com",
+  databaseURL: "https://neetpreppro-445b2-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "neetpreppro-445b2",
+  storageBucket: "neetpreppro-445b2.firebasestorage.app",
+  messagingSenderId: "589750441567",
+  appId: "1:589750441567:web:7396b9de030374cabe2dea",
+  measurementId: "G-7SYLBDLY71"
+};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // ── Utilities ──
+        function showToast(msg, type = 'info') {
+            const c = document.getElementById('toast-container');
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${msg}</span><button class="toast-close">✕</button>`;
+            t.querySelector('.toast-close').addEventListener('click', () => dismiss(t));
+            c.appendChild(t);
+            setTimeout(() => dismiss(t), 4000);
+        }
+
+        function dismiss(t) {
+            t.style.animation = 'toastOut .3s ease forwards';
+            setTimeout(() => t.remove(), 300);
+        }
+
+        // ── State ──
+        let allTests = []; // all topic-type tests from Firebase
+        let activeTab = 'all'; // current subject filter
+        let searchVal = ''; // current search string
+
+        // ── Auth Guard ──
+        onAuthStateChanged(auth, async user => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const name = user.displayName || 'Student';
+            document.getElementById('user-name-nav').textContent = name.split(' ')[0];
+            document.getElementById('user-avatar').textContent = name[0].toUpperCase();
+            await loadTests();
+        });
+
+        // ── Load topic-type tests from Firebase ──
+        async function loadTests() {
+            try {
+                const snap = await get(query(ref(db, 'tests'), orderByChild('type'), equalTo('topic')));
+                allTests = [];
+                if (snap.exists()) {
+                    snap.forEach(child => allTests.push({
+                        id: child.key,
+                        ...child.val()
+                    }));
+                }
+
+                // Update tab counts
+                updateCounts();
+                render();
+
+            } catch (err) {
+                console.error(err);
+                if (err.message?.includes('offline') || err.code === 'unavailable') {
+                    showToast('You appear to be offline. Check your connection.', 'error');
+                } else {
+                    showToast('Failed to load tests. Please refresh.', 'error');
+                }
+                renderEmpty('Could not load tests. Please refresh the page.');
+            }
+        }
+
+        // ── Update tab counts ──
+        function updateCounts() {
+            document.getElementById('cnt-all').textContent = allTests.length;
+            document.getElementById('cnt-physics').textContent = allTests.filter(t => t.subject === 'Physics').length;
+            document.getElementById('cnt-chemistry').textContent = allTests.filter(t => t.subject === 'Chemistry').length;
+            document.getElementById('cnt-biology').textContent = allTests.filter(t => t.subject === 'Biology').length;
+        }
+
+        // ── Filter tests by tab + search ──
+        function getFiltered() {
+            return allTests.filter(t => {
+                const matchSubject = activeTab === 'all' || t.subject === activeTab;
+                const matchSearch = !searchVal ||
+                    (t.title || '').toLowerCase().includes(searchVal) ||
+                    (t.chapter || '').toLowerCase().includes(searchVal) ||
+                    (t.topic || '').toLowerCase().includes(searchVal);
+                return matchSubject && matchSearch;
+            });
+        }
+
+        // ── Render all tests grouped by chapter ──
+        function render() {
+            const container = document.getElementById('tests-container');
+            const filtered = getFiltered();
+            const countEl = document.getElementById('results-count');
+
+            countEl.textContent = `${filtered.length} test${filtered.length!==1?'s':''} found`;
+
+            if (!filtered.length) {
+                renderEmpty(allTests.length ? 'No tests match your search.' : 'No topic tests available yet.');
+                return;
+            }
+
+            // Group by chapter
+            const chapters = {};
+            filtered.forEach(t => {
+                const ch = t.chapter || 'General';
+                if (!chapters[ch]) chapters[ch] = [];
+                chapters[ch].push(t);
+            });
+
+            const badgeCls = s => s === 'Physics' ? 'badge-physics' : s === 'Chemistry' ? 'badge-chemistry' : 'badge-biology';
+            const diffConfig = d => d === 'Hard' ? {
+                cls: 'diff-hard',
+                lbl: 'Hard'
+            } : d === 'Medium' ? {
+                cls: 'diff-medium',
+                lbl: 'Medium'
+            } : {
+                cls: 'diff-easy',
+                lbl: 'Easy'
+            };
+
+            container.innerHTML = Object.entries(chapters).map(([chapter, tests]) => `
+        <div class="chapter-group">
+          <div class="chapter-heading">
+            <h2>${chapter}</h2>
+            <span class="chapter-tag">${tests.length} test${tests.length!==1?'s':''}</span>
+          </div>
+          <div class="tests-grid">
+            ${tests.map(t => {
+              const diff = diffConfig(t.difficulty);
+              return `
+                <div class="test-card">
+                  <div class="test-card-top">
+                    <span class="topic-badge ${badgeCls(t.subject)}">${t.subject}</span>
+                    <span style="font-size:.78rem;color:var(--text-muted);">${t.topic||''}</span>
+                  </div>
+                  <div class="test-card-title">${t.title||'Untitled Test'}</div>
+                  <div class="test-card-meta">
+                    <span class="meta-item">❓ ${(t.questionIds||[]).length} Questions</span>
+                    <span class="meta-item">⏱ ${t.duration||10} min</span>
+                    <span class="meta-item">✏️ ${(t.questionIds||[]).length * 4} marks</span>
+                  </div>
+                  <div class="test-card-footer">
+                    <span class="diff-label">
+                      <span class="difficulty-dot ${diff.cls}"></span>${diff.lbl}
+                    </span>
+                    <a href="exam.html?testId=${t.id}" class="btn-start">Start Test →</a>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `).join('');
+        }
+
+        // ── Render empty state ──
+        function renderEmpty(msg) {
+            document.getElementById('tests-container').innerHTML = `
+        <div class="empty-state">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <h4>No Tests Found</h4>
+          <p>${msg}</p>
+        </div>
+      `;
+        }
+
+        // ── Tab Buttons ──
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeTab = btn.dataset.subject;
+                render();
+            });
+        });
+
+        // ── Search ──
+        document.getElementById('search-input').addEventListener('input', e => {
+            searchVal = e.target.value.trim().toLowerCase();
+            render();
+        });
+
+        // ── Avatar dropdown ──
+        const avatarBtn = document.getElementById('avatar-btn');
+        const dropdown = document.getElementById('nav-dropdown');
+        avatarBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            dropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', () => dropdown.classList.remove('open'));
+
+        // ── Logout ──
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (err) {
+                console.error(err);
+                showToast('Logout failed.', 'error');
+            }
+        }
+        document.getElementById('btn-logout').addEventListener('click', handleLogout);
+        document.getElementById('mobile-logout').addEventListener('click', handleLogout);
+
+        // ── Mobile nav ──
+        const hamburger = document.getElementById('hamburger');
+        const mobileNav = document.getElementById('mobile-nav');
+        hamburger.addEventListener('click', () => mobileNav.classList.toggle('open'));
+        document.addEventListener('click', e => {
+            if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) mobileNav.classList.remove('open');
+        });
+    </script>
+</body>
+
+</html>
